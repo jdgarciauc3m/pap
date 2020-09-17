@@ -1,0 +1,48 @@
+\section{Altas prestaciones en aplicaciones secuenciales}
+
+\begin{frame}[t]{Efectos de las arquitecturas segmentadas}
+\begin{itemize}
+  \item La mayoría de los procesadores hoy día usan arquitecturas segmentadas (\emph{pipeline}).
+  \item Esto provoca detenciones para evitar:
+    \begin{itemize}
+      \item Riesgos de datos: Los accesos a datos provocan detenciones
+        \begin{itemize}
+          \item Especialmente si no se encuentran en la caché.
+        \end{itemize}
+      \item Riesgos de control: Las bifurcaciones condicionales provocan detenciones.
+        \begin{itemize}
+          \item Mitigado en parte con el predictor de saltos.
+          \item Uso por el compilador de desenrrollamiento de bucles.
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{Memoria caché}
+\begin{itemize}
+  \item Memorias de acceso rápido (normalmente en el propio chip).
+  \item Aprovechamiento del principio de localidad:
+    \begin{itemize}
+      \item Localidad espacial.
+      \item Localidad temporal.
+    \end{itemize}
+  \item Objetivo: Obtener una alta tasa de aciertos en caché.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{¿Cómo aprovechar la caché?}
+\begin{itemize}
+  \item El compilador ya usa técnicas de aprovechamiento de la caché:
+    \begin{itemize}
+      \item Código: reordenación de rutinas, alinear bloques básicos a líneas de caché, linearización de saltos, \ldots
+      \item Datos: Fusión de bucles, intercambio de bucles, \ldots
+    \end{itemize}
+  \vfill
+  \item Pero el desarrollador puede ayudar:
+    \begin{itemize}
+      \item Organización de arrays multidimensionales.
+      \item Acceso a matrices por bloques.
+      \item Evitar uso excesivo de memoria dinámica.
+    \end{itemize}
+\end{itemize}
+\end{frame}

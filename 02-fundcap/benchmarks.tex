@@ -1,0 +1,96 @@
+\subsection{Benchmarks}
+
+\begin{frame}[t]{Carga de trabajo}
+\begin{itemize}
+  \item El \textmark{rendimiento} de un computador depende de 
+        la \textmark{carga de trabajo} con la que se evalúa.
+  \mode<presentation>{\pause\vfill}
+  \item Computadores adaptados a cargas específicas:
+    \begin{itemize}
+      \item Servidores web.
+      \item Servidores de bases de datos.
+      \item Servidores de ficheros.
+      \item Computadores personales.
+      \item Multiprocesadores.
+      \item Multicomputadores.
+      \item \ldots
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{Benchmarks}
+\begin{itemize}
+  \item Aplicación o conjunto de aplicaciones usadas para evaluar el rendimiento.
+  \mode<presentation>{\pause\vfill}
+  \item \textenum{Aproximaciones}:
+    \begin{itemize}
+      \item \textmark{Kernels}: Partes pequeñas de aplicaciones reales.
+        \begin{itemize}
+          \item \emph{Ejemplo}: FFT.
+        \end{itemize}
+      \item \textmark{Programas de juguete}: Programas cortos.
+        \begin{itemize}
+          \item \emph{Ejemplo}: Quicksort.
+        \end{itemize}
+      \item \textmark{Benchmarks sintéticos}: Inventados para representar aplicaciones reales.
+        \begin{itemize}
+          \item \emph{Ejemplo}: Dhrystone.
+        \end{itemize}
+    \end{itemize}
+  \mode<presentation>{\pause\vfill}
+  \item Todas malas aproximaciones:
+    \begin{itemize}
+      \item \alert{¡El arquitecto y el compilador pueden engañar!}
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{Benchmarks}
+\begin{itemize}
+  \item \textenum{Empotrados}:
+    \begin{itemize}
+      \item Dhrystone (relevancia discutible).
+      \item EEMBC (kernels).
+    \end{itemize}
+  \mode<presentation>{\pause\vfill}
+  \item \textenum{Desktop}:
+    \begin{itemize}
+      \item SPEC2006 (mezcla de programas enteros y coma flotante).
+    \end{itemize}
+  \mode<presentation>{\pause\vfill}
+  \item \textenum{Servidores}:
+    \begin{itemize}
+      \item SPECWeb, SPECSFS, SPECjbb, SPECvirt\_Sc2010.
+      \item TPC
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{Ejemplo: SPEC2006}
+\begin{itemize}
+  \item \textmark{CINT2006}: Parte con programas enteros (sin coma flotante).
+    \begin{itemize}
+      \item 12 programas (9 en C, 3 en C++).
+      \item Diversas áreas de aplicación:
+        \begin{itemize}
+          \item Lenguajes y compiladores, compresión, vídeo, optimización combinatoria,
+                inteligencia artificial, secuenciado de proteínas, física cuántica, \ldots
+        \end{itemize}
+    \end{itemize}
+  \item \textmark{CFP2006}: Parte con programas de coma flotante.
+    \begin{itemize}
+      \item 17 programas.
+        \begin{itemize}
+          \item Fortran: 6.
+          \item C: 3
+          \item Fortran y C: 4
+          \item C++: 4
+        \end{itemize}
+      \item Diversas áreas de aplicación:
+        \begin{itemize}
+          \item Física, Química, Biología, Álgebra, \emph{Rendering} de imágenes,
+                Reconocimiento del habla, \ldots
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+\end{frame}
