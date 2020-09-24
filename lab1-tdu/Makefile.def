@@ -1,0 +1,9 @@
+LAB1_TDU_BASE= lab1-tdu
+LAB1_TDU_PARTS= \
+$(LAB1_TDU_BASE)/*.tex  \
+metadata.tex
+
+LAB1_TDU_OUT=lab1-tdu
+LAB1_TDU_PDF=$(LAB1_TDU_OUT).pdf
+
+FINAL_LAB1_TDU_PDF=$(FINAL_DIR)/$(LAB1_TDU_PDF)
