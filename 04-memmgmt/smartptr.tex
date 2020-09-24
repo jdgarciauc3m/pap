@@ -1,0 +1,412 @@
+\section{Punteros inteligentes}
+
+\subsection{Introducción}
+
+\begin{frame}[fragile]{Simplificación la gestión de punteros}
+\begin{itemize}
+  \item Un patrón de uso típico de uso de punteros es la gestión de memoria dinámica.
+\begin{lstlisting}
+void f() {
+  vector * p = new  vector{1,2,3}};
+  g(p); // Podría lanzar excepciones
+  if (h(*p)) return;
+  delete p;
+}
+\end{lstlisting}
+  \item Problemas:
+    \begin{itemize}
+      \item Si \cppid{g()} lanza una excepción se genera un goteo de memoria.
+      \item Se podría salir de \cppid{g()} sin desasignar la memoria.
+      \item Es fácil olvidar algún \cppkey{delete}.
+      \item Se puede confundir \cppkey{delete} con \cppkey{delete[]}.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t,fragile]{No usar punteros}
+\begin{itemize}
+  \item Suele ser la solución más simple.
+\begin{lstlisting}
+void f() {
+  vector v{1,2,3};
+  g(&v); // Podría lanzar excepciones
+  if (h(v)) return;
+} // se destruye v
+\end{lstlisting}
+  \item Recuerda:
+    \begin{itemize}
+      \item Utiliza la memoria dinámica solamente si es necesario.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Punteros inteligentes}
+\begin{itemize}
+  \item Un \alert{puntero inteligente} es un tipo que encapsula un puntero
+        y gestiona de forma automática la gestión de la memoria asociada.
+    \begin{itemize}
+      \item Su destructor libera automáticamente la memoria asociada.
+    \end{itemize}
+  \item Tipos de punteros inteligentes:
+    \begin{itemize}
+      \item \cppid{unique\_ptr}: Puntero a un bloque que no admite copias.
+      \item \cppid{shared\_ptr}: Puntero con contador de referencias asociado.
+      \item \cppid{weak\_ptr}: Puntero auxiliar para \cppid{shared\_ptr}.
+      \item \cppid{auto\_ptr}: Despreciado. \alert{No usar}.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\subsection{Punteros compartidos}
+
+\begin{frame}[fragile]{Cuenta de referencias}
+\begin{itemize}
+  \item Un \cppid{shared\_ptr} mantiene un contador de referencias.
+    \begin{itemize}
+      \item Cuando se copia se incrementa el contador de referencias.
+     \item Cuando se destruye se decrementa el contador y si llega a 0 se desasigna la memoria.
+    \end{itemize}
+\end{itemize}
+\begin{lstlisting}
+void f() {
+  shared_ptr<string> p1{new string{"Hola"}};
+  shared_ptr<string> p2{p1}; // referencias -> 2
+
+  auto n = p1->size(); // string::size(), p1 usado como puntero
+  *p1 = "Adios"; // *p1 == *p2 == "Adios"
+  if (p2) { // Conversión a bool
+    cerr << "Ocupado" << endl;
+  }
+
+  p1 = nullptr; // referencias -> 1
+  // ...
+} // referencias -> 0 ==> Destrucción
+
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Construcción}
+\begin{itemize}
+  \item Se puede construir por defecto (apunta a \cppkey{nullptr}):
+\begin{lstlisting}
+shared_ptr<fecha> p1; // p1 == nullptr
+\end{lstlisting}
+  \item Se pueden copiar punteros:
+\begin{lstlisting}
+shared_ptr<fecha> p2{p1};
+shared_ptr<const fecha> p3{p1};
+\end{lstlisting}
+  \item Se puede iniciar con un puntero primitivo:
+\begin{lstlisting}
+shared_ptr<fecha> p3{new fecha};
+\end{lstlisting}
+  \item Se puede iniciar con objetos temporales de tipo \cppid{unique\_ptr}:
+\begin{lstlisting}
+unique_ptr<fecha> crea_fecha();
+shared_ptr<fecha> p3{crea_fecha()};
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Acceso a información}
+\begin{itemize}
+  \item Acceso al puntero primitivo interno.
+\begin{lstlisting}
+void func_antigua(fecha * pf);
+
+void f() {
+  shared_ptr<fecha> p { new fecha };
+  func_antigua(p.get());
+}
+\end{lstlisting}
+  \item Acceso a contador de referencias.
+\begin{lstlisting}
+if (p.unique()) {
+  cout << "No hay más referencias" << endl;
+}
+
+cout << "Referencias: " << p.use_count() << endl;
+\end{lstlisting}
+  \item \alert{Aviso}: \cppid{use\_count()} puede ser menos eficiente.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Eliminación personalizada}
+\begin{itemize}
+  \item Por defecto, el puntero asociado se libera mediante \cppkey{delete}.
+  \item Se puede suministrar otro mecanismo de liberación.
+\begin{lstlisting}
+conexion * abrir_conexion();
+void cerrar_conexion(conexion * pc);
+
+void f() {
+  shared_ptr<conexion> p{abrir_conexion(), cerrar_conexion}
+  
+  // ...
+
+} // cerrar_conexion(p);
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t,fragile]{Creación simplificada}
+\begin{itemize}
+  \item Funciones de creación.
+    \begin{itemize}
+      \item \cppid{make\_shared} Crea un \cppid{shared\_ptr} usando \cppkey{new}.
+    \end{itemize}
+\begin{lstlisting}
+auto p = make_shared<registro>("Daniel", 43);
+\end{lstlisting}
+  \item Asigna el objeto y los metadatos con una única operación.
+\end{itemize}
+\end{frame}
+
+\subsection{Punteros únicos}
+
+\begin{frame}{Punteros únicos}
+\begin{itemize}
+  \item \cppid{unique\_ptr} ofrece un puntero no compartido que no se puede copiar.
+    \begin{itemize}
+      \item Soporta semántica de movimiento.
+      \item Se puede usar en contenedores y arrays.
+      \item Puede apuntar a arrays.
+    \end{itemize}
+  \item Eficiencia:
+    \begin{itemize}
+      \item Es más eficiente devolver \cppid{unique\_ptr} que \cppid{shared\_ptr}.
+      \item Puede requerir algo más de espacio (un segundo puntero para eliminador).
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Semántica y usos}
+\begin{itemize}
+  \item \cppid{unique\_ptr} ofrece semántica de propiedad estricta.
+    \begin{itemize}
+      \item Posee el objeto apuntado y lo destruye.
+      \item No puede ser copiado pero si puede ser movido.
+      \item Cuando se destruye, destruye el objeto usando su eliminador (si se suministra uno).
+    \end{itemize}
+  \item ¿Dónde usar \cppid{unique\_ptr}?
+    \begin{itemize}
+      \item Seguridad ante excepciones de memoria asignada dinámicamente.
+      \item Pasar la propiedad de memoria asignada dinámicamente a una función.
+      \item Devolver memoria dinámicamente asignada de una función.
+      \item Almacenar punteros a contenedores.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Seguridad ante excepciones}
+\begin{itemize}
+  \item Garantizada por la semántica de propiedad estricta.
+\begin{lstlisting}
+void f(string & s, int x) {
+  unique_ptr<int> p { new int{50} };
+
+  string n = s; // Excepción potencial
+  if (x < 0) throw out_of_range{};
+
+  *p = 42;
+}
+\end{lstlisting}
+  \item Si se lanza una excepción el destructor de \cppid{unique\_ptr} garantiza
+  que se libera la memoria.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Valor de retorno}
+\begin{itemize}
+  \item La devolución se basa en la semántica de movimiento.
+\begin{lstlisting}
+unique_ptr<int> f(int x) {
+  unique_ptr<int> p { new int {x} };
+  return p;
+}
+
+void g() {
+  auto z = f(5);
+}
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Paso como parámetro}
+\begin{itemize}
+  \item Dos alternativas para pasar como parámetro:
+    \begin{itemize}
+      \item Pasar una referencia.
+      \item Usar semántica de movimiento.
+    \end{itemize}
+\begin{lstlisting}
+void f(const unique_ptr<int> & p) {
+  *p = 42;
+}
+
+unique_ptr<int> g(unique_ptr<int> p) {
+  *p = 42;
+  return p;
+}
+
+void h() {
+  unique_ptr<int> q { new int{24} };
+  f(q); // OK
+  q = g(q); // Error: No se puede copiar
+  q = g(move(q)); // OK
+}  
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Dato miembro}
+\begin{itemize}
+  \item Simplifica la gestión de datos miembros que tradicionalmente
+  eran punteros.
+\begin{lstlisting}
+class X {
+public:
+  X() : y{} {}
+  void pon_valor(Z z) { y.reset(new Y{z}); }
+private:
+  unique_ptr<Y> y;
+};
+\end{lstlisting}
+  \item Comportamiento por defecto es el deseado
+    \begin{itemize}
+      \item Destrucción.
+      \item Movimiento.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Uso en contenedores}
+\begin{lstlisting}
+using mi_vec = vector<unique_ptr<registro>>;
+
+mi_vec genera_registros() {
+  mi_vec v;
+  for (int i=0; i<max_reg; ++i) {
+    unique_ptr<registro> r;
+    if (existe(i)) {
+      r.reset(new registro{obten_registro(i)});
+    }
+    v.push_back(r);
+  }
+  return v;
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Eliminadores personalizados}
+\begin{itemize}
+  \item Igual que \cppid{shared\_ptr}.
+  \item Ejemplo: Datos obtenidos de una biblioteca que se obtuvieron con
+        \cppid{malloc} y tienen que liberarse con \cppid{free}.
+\begin{lstlisting}
+buffer * get_buffer(int n); // Deben liberarse con free
+
+using free_ptr = void (*)(void *);
+
+void f() {
+  unique_ptr<char, free_ptr> buf { get_data(128), free);
+  // ...
+} // free(buf.get())
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{¿\texttt{make\_unique}?}
+\begin{itemize}
+  \item La biblioteca estándar no proporciona \cppid{make\_unique} (al estilo de
+        \cppid{make\_shared} o \cppid{make\_pair}).
+  \item Pero es fácil definirlo:
+\end{itemize}
+\begin{lstlisting}
+template <typename T, typename ... Args>
+unique_ptr<T> make_unique(Args && ... args)
+{
+  return unique_ptr<T>{new T{args...}};
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Arrays}
+\begin{itemize}
+  \item \cppid{unique\_ptr} soporta punteros a arrays.
+     \begin{itemize}
+       \item Es el único puntero inteligente que los soporta.
+     \end{itemize}
+\begin{lstlisting}
+unique_ptr<int[]> crea_lista(int n) {
+  unique_ptr<int[]> p{new int[n]};
+  for (int i=0; i<n; ++i) {
+    p[i] = i;
+  }
+  return p;
+}
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+
+\subsection{Punteros inteligentes y vector}
+
+\mode<presentation>{
+
+\begin{frame}
+\begin{block}{vector.h}
+\lstinputlisting[lastline=17]{04-memmgmt/vec6/vector.h}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\begin{block}{vector.h}
+\lstinputlisting[firstline=19]{04-memmgmt/vec6/vector.h}
+\end{block}
+\end{frame}
+
+}
+
+\mode<article> {
+
+\begin{frame}
+\begin{block}{vector.h}
+\lstinputlisting{04-memmgmt/vec6/vector.h}
+\end{block}
+\end{frame}
+
+}
+
+\mode<presentation> {
+
+\begin{frame}
+\begin{block}{vector.cpp}
+\lstinputlisting[lastline=15]{04-memmgmt/vec6/vector.cpp}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\begin{block}{vector.cpp}
+\lstinputlisting[firstline=17,lastline=30]{04-memmgmt/vec6/vector.cpp}
+\end{block}
+\end{frame}
+
+
+\begin{frame}
+\begin{block}{vector.cpp}
+\lstinputlisting[firstline=32]{04-memmgmt/vec6/vector.cpp}
+\end{block}
+\end{frame}
+
+}
+
+\mode<article> {
+
+\begin{frame}
+\begin{block}{vector.cpp}
+\lstinputlisting{04-memmgmt/vec6/vector.cpp}
+\end{block}
+\end{frame}
+
+}

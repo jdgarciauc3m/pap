@@ -1,0 +1,545 @@
+\section{Acceso a elementos}
+
+\subsection{Introducción}
+
+\begin{frame}[fragile]{Operadores de acceso}
+\begin{itemize}
+  \item Actualmente:
+\begin{lstlisting}
+v.pon(i,5);
+x = v.obten(i);
+\end{lstlisting}
+  \item \alert{Objetivo}:
+\begin{lstlisting}
+v[i] = 5;
+x = v[i];
+\end{lstlisting}
+  \item Mecanismo: sobrecarga de operadores.
+    \begin{itemize}
+      \item Se puede sobrecargar el operador \cppid{[]}.
+      \item El operador sobrecargado tiene que ser una función miembro.
+      \item Para que la expresión \cppid{v[i]} puede recibir una asignación 
+            el operador debe devolve una referencia.
+    \end{itemize}
+\begin{lstlisting}
+class vector {
+  // ...
+  double & operator[](int i) { return vec[i]; }
+  // ...
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Utilización}
+\begin{lstlisting}
+void f(vector & v) {
+  for (int i=0; i<v.tamanyo(); ++i) {
+    v[i] = i  * 2.0;
+  }
+  cout << v[v.tamanyo()-1] << endl;
+}
+\end{lstlisting}
+\pause
+\begin{lstlisting}
+void f(const vector & v) {
+  for (int i=0; i<v.tamanyo(); ++i) {
+    v[i] = i  * 2.0;
+  }
+  cout << v[v.tamanyo()-1] << endl;
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Solución}
+\begin{itemize}
+  \item Sobrecargar el operador \cppid{[]} con dos versiones.
+    \begin{itemize}
+      \item Una versión \emph{no-constante}.
+      \item Una versión \emph{constante}.
+    \end{itemize}
+\begin{lstlisting}
+double & operator[](int i) { return vec[i]; }
+double operator[](int i) const { return vec[i]; }
+\end{lstlisting}
+  \item El sistema de tipos selecciona que llamada realizar.
+\end{itemize}
+\end{frame}
+
+\subsection{Cambio de tamaño}
+
+\begin{frame}[fragile]{Un vector dinámico}
+\begin{itemize}
+  \item Objetivo: Permitir que se puedan añadir elementos a un vector.
+\begin{lstlisting}
+vector v(10);
+v.push_back(1.0); // 11 elementos
+v.push_back(0.5); // 12 elementos
+\end{lstlisting}
+  \item Problema: Cuando se crea \cppid{v} tiene asociado un vector de tamaño 10.
+  \item Estrategia:
+    \begin{itemize}
+      \item Diferencia entre
+        \begin{itemize}
+          \item Tamaño: Número de elementos que tiene el vector.
+          \item Capacidad: Número máximo de elementos que caben.
+        \end{itemize}
+      \item Cuando el vector está lleno reservar otro de mayor tamaño y copiar los elementos.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Reserva de espacio}
+\begin{itemize}
+  \item \cppid{reserva(n)}: Asegura la reserva espacio para \cppid{n} elementos.
+    \begin{itemize}
+      \item Si \cppid{n} es menor que el espacio actual no hace nada.
+      \item Deja los elementos nuevos sin iniciar.
+    \end{itemize}
+\end{itemize}
+\begin{tikzpicture}
+\tikzset{
+    bloque/.style={rectangle,draw=black, top color=white, bottom color=blue!50,
+                   very thick, inner sep=0.5em, minimum size=0.6cm, text centered, font=\tiny},
+    bloquelibre/.style={rectangle,draw=black, top color=white, bottom color=blue!10,
+                   very thick, inner sep=0.5em, minimum size=0.6cm, text centered, font=\tiny},
+    flecha/.style={->, >=latex', shorten >=1pt, thick},
+    etiqueta/.style={text centered, font=\tiny} 
+}  
+\node[bloque] (bsize) {2};
+\node[bloque, right=0cm of bsize] (bcap) {4};
+\node[bloque,right=0cm of bcap] (bptr) { };
+\node[bloque,right=0.5cm of bptr] (v0) {1.0};
+\node[bloque,right=0cm of v0] (v1) {2.0};
+\node[bloquelibre,right=0cm of v1] (v2) {?};
+\node[bloquelibre,right=0cm of v2] (v3) {?};
+\draw[flecha] (bptr) -- (v0);
+\node[etiqueta, left=0.1cm of bsize] {v1:};
+\node[etiqueta, above=0cm of bsize] {tam};
+\node[etiqueta, above=0cm of bcap] {cap};
+\node[etiqueta, above=0cm of bptr] {vec};
+\end{tikzpicture}
+\begin{itemize}
+  \item \pause \cppid{v.reserva(8)}
+\end{itemize}
+\begin{tikzpicture}
+\tikzset{
+    bloque/.style={rectangle,draw=black, top color=white, bottom color=blue!50,
+                   very thick, inner sep=0.5em, minimum size=0.6cm, text centered, font=\tiny},
+    bloquelibre/.style={rectangle,draw=black, top color=white, bottom color=blue!10,
+                   very thick, inner sep=0.5em, minimum size=0.6cm, text centered, font=\tiny},
+    flecha/.style={->, >=latex', shorten >=1pt, thick},
+    etiqueta/.style={text centered, font=\tiny} 
+}  
+\node[bloque] (bsize) {2};
+\node[bloque, right=0cm of bsize] (bcap) {8};
+\node[bloque,right=0cm of bcap] (bptr) { };
+
+\node[bloque,right=0.5cm of bptr] (v0) {1.0};
+\node[bloque,right=0cm of v0] (v1) {2.0};
+\node[bloquelibre,right=0cm of v1] (v2) {?};
+\node[bloquelibre,right=0cm of v2] (v3) {?};
+\node[etiqueta, right=0.5cm of v3] (delete) {\cppkey{delete[]}};
+\draw[flecha] (delete) -- (v3);
+
+\node[bloque, below right=0.5cm and 0.5cm of bptr] (nv0) {1.0};
+\node[bloque,right=0cm of nv0] (nv1) {2.0};
+\node[bloquelibre,right=0cm of nv1] (nv2) {?};
+\node[bloquelibre,right=0cm of nv2] (nv3) {?};
+\node[bloquelibre,right=0cm of nv3] (nv4) {?};
+\node[bloquelibre,right=0cm of nv4] (nv5) {?};
+\node[bloquelibre,right=0cm of nv5] (nv6) {?};
+\node[bloquelibre,right=0cm of nv6] (nv7) {?};
+
+\draw[flecha] (bptr) -- (nv0);
+\node[etiqueta, left=0.1cm of bsize] {v1:};
+\node[etiqueta, above=0cm of bsize] {tam};
+\node[etiqueta, above=0cm of bcap] {cap};
+\node[etiqueta, above=0cm of bptr] {vec};
+\end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Cambio de tamaño}
+\begin{itemize}
+  \item \cppid{redimiensiona(n)}: Cambia el tamaño de un vector.
+    \begin{itemize}
+      \item Nuevo tamaño excede capacidad total $\rightarrow$ \cppid{reserva(n)}
+      \item Nuevo tamaño mayor que tamaño actual pero no excede capacidad total $\rightarrow$ Iniciar elementos nuevos y actualizar tamaño.
+      \item Nuevo tamaño menor que tamaño actual $\rightarrow$ Actualizar tamaño.
+    \end{itemize}
+\end{itemize}
+\pause
+\begin{tikzpicture}
+\tikzset{
+    bloque/.style={rectangle,draw=black, top color=white, bottom color=blue!50,
+                   very thick, inner sep=0.5em, minimum size=0.6cm, text centered, font=\tiny},
+    bloquelibre/.style={rectangle,draw=black, top color=white, bottom color=blue!10,
+                   very thick, inner sep=0.5em, minimum size=0.6cm, text centered, font=\tiny},
+    flecha/.style={->, >=latex', shorten >=1pt, thick},
+    etiqueta/.style={text centered, font=\tiny} 
+}  
+\node[bloque] (bsize) {2};
+\node[bloque, right=0cm of bsize] (bcap) {4};
+\node[bloque,right=0cm of bcap] (bptr) { };
+\node[bloque,right=0.5cm of bptr] (v0) {1.0};
+\node[bloque,right=0cm of v0] (v1) {2.0};
+\node[bloquelibre,right=0cm of v1] (v2) {?};
+\node[bloquelibre,right=0cm of v2] (v3) {?};
+\draw[flecha] (bptr) -- (v0);
+\node[etiqueta, left=0.1cm of bsize] {v1:};
+\node[etiqueta, above=0cm of bsize] {tam};
+\node[etiqueta, above=0cm of bcap] {cap};
+\node[etiqueta, above=0cm of bptr] {vec};
+\end{tikzpicture}
+\begin{itemize}
+  \item \pause \cppid{redimensiona(3)}
+\end{itemize}
+\pause
+\begin{tikzpicture}
+\tikzset{
+    bloque/.style={rectangle,draw=black, top color=white, bottom color=blue!50,
+                   very thick, inner sep=0.5em, minimum size=0.6cm, text centered, font=\tiny},
+    bloquelibre/.style={rectangle,draw=black, top color=white, bottom color=blue!10,
+                   very thick, inner sep=0.5em, minimum size=0.6cm, text centered, font=\tiny},
+    flecha/.style={->, >=latex', shorten >=1pt, thick},
+    etiqueta/.style={text centered, font=\tiny} 
+}  
+\node[bloque] (bsize) {3};
+\node[bloque, right=0cm of bsize] (bcap) {4};
+\node[bloque,right=0cm of bcap] (bptr) { };
+\node[bloque,right=0.5cm of bptr] (v0) {1.0};
+\node[bloque,right=0cm of v0] (v1) {2.0};
+\node[bloque,right=0cm of v1] (v2) {0.0};
+\node[bloquelibre,right=0cm of v2] (v3) {?};
+\draw[flecha] (bptr) -- (v0);
+\node[etiqueta, left=0.1cm of bsize] {v1:};
+\node[etiqueta, above=0cm of bsize] {tam};
+\node[etiqueta, above=0cm of bcap] {cap};
+\node[etiqueta, above=0cm of bptr] {vec};
+\end{tikzpicture}
+\end{frame}
+
+\begin{frame}
+\begin{tikzpicture}
+\tikzset{
+    bloque/.style={rectangle,draw=black, top color=white, bottom color=blue!50,
+                   very thick, inner sep=0.5em, minimum size=0.6cm, text centered, font=\tiny},
+    bloquelibre/.style={rectangle,draw=black, top color=white, bottom color=blue!10,
+                   very thick, inner sep=0.5em, minimum size=0.6cm, text centered, font=\tiny},
+    flecha/.style={->, >=latex', shorten >=1pt, thick},
+    etiqueta/.style={text centered, font=\tiny} 
+}  
+\node[bloque] (bsize) {3};
+\node[bloque, right=0cm of bsize] (bcap) {4};
+\node[bloque,right=0cm of bcap] (bptr) { };
+\node[bloque,right=0.5cm of bptr] (v0) {1.0};
+\node[bloque,right=0cm of v0] (v1) {2.0};
+\node[bloque,right=0cm of v1] (v2) {0.0};
+\node[bloquelibre,right=0cm of v2] (v3) {?};
+\draw[flecha] (bptr) -- (v0);
+\node[etiqueta, left=0.1cm of bsize] {v1:};
+\node[etiqueta, above=0cm of bsize] {tam};
+\node[etiqueta, above=0cm of bcap] {cap};
+\node[etiqueta, above=0cm of bptr] {vec};
+\end{tikzpicture}
+\begin{itemize}
+  \item \pause \cppid{redimensiona(1)}
+\end{itemize}
+\pause
+\begin{tikzpicture}
+\tikzset{
+    bloque/.style={rectangle,draw=black, top color=white, bottom color=blue!50,
+                   very thick, inner sep=0.5em, minimum size=0.6cm, text centered, font=\tiny},
+    bloquelibre/.style={rectangle,draw=black, top color=white, bottom color=blue!10,
+                   very thick, inner sep=0.5em, minimum size=0.6cm, text centered, font=\tiny},
+    flecha/.style={->, >=latex', shorten >=1pt, thick},
+    etiqueta/.style={text centered, font=\tiny} 
+}  
+\node[bloque] (bsize) {1};
+\node[bloque, right=0cm of bsize] (bcap) {4};
+\node[bloque,right=0cm of bcap] (bptr) { };
+\node[bloque,right=0.5cm of bptr] (v0) {1.0};
+\node[bloquelibre,right=0cm of v0] (v1) {2.0};
+\node[bloquelibre,right=0cm of v1] (v2) {0.0};
+\node[bloquelibre,right=0cm of v2] (v3) {?};
+\draw[flecha] (bptr) -- (v0);
+\node[etiqueta, left=0.1cm of bsize] {v1:};
+\node[etiqueta, above=0cm of bsize] {tam};
+\node[etiqueta, above=0cm of bcap] {cap};
+\node[etiqueta, above=0cm of bptr] {vec};
+\end{tikzpicture}
+\begin{itemize}
+  \item \pause \cppid{v.redimensiona(6)}
+\end{itemize}
+\pause
+\begin{tikzpicture}
+\tikzset{
+    bloque/.style={rectangle,draw=black, top color=white, bottom color=blue!50,
+                   very thick, inner sep=0.5em, minimum size=0.6cm, text centered, font=\tiny},
+    bloquelibre/.style={rectangle,draw=black, top color=white, bottom color=blue!10,
+                   very thick, inner sep=0.5em, minimum size=0.6cm, text centered, font=\tiny},
+    flecha/.style={->, >=latex', shorten >=1pt, thick},
+    etiqueta/.style={text centered, font=\tiny} 
+}  
+\node[bloque] (bsize) {6};
+\node[bloque, right=0cm of bsize] (bcap) {6};
+\node[bloque,right=0cm of bcap] (bptr) { };
+
+\node[bloque,right=0.5cm of bptr] (v0) {1.0};
+\node[bloquelibre,right=0cm of v0] (v1) {2.0};
+\node[bloquelibre,right=0cm of v1] (v2) {0.0};
+\node[bloquelibre,right=0cm of v2] (v3) {?};
+\node[etiqueta, right=0.5cm of v3] (delete) {\cppkey{delete[]}};
+\draw[flecha] (delete) -- (v3);
+
+\node[bloque,below right=0.5cm and 0.5cm of bptr] (nv0) {1.0};
+\node[bloque,right=0cm of nv0] (nv1) {2.0};
+\node[bloque,right=0cm of nv1] (nv2) {0.0};
+\node[bloque,right=0cm of nv2] (nv3) {0.0};
+\node[bloque,right=0cm of nv3] (nv4) {0.0};
+\node[bloque,right=0cm of nv4] (nv5) {0.0};
+
+\draw[flecha] (bptr) -- (nv0);
+
+\node[etiqueta, left=0.1cm of bsize] {v1:};
+\node[etiqueta, above=0cm of bsize] {tam};
+\node[etiqueta, above=0cm of bcap] {cap};
+\node[etiqueta, above=0cm of bptr] {vec};
+\end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Agregación de elementos}
+\begin{itemize}
+  \item \cppid{agrega\_final(x)}: Agrega un elemento al final del vector modificando su tamaño.
+    \begin{itemize}
+      \item Si no hay espacio disponible se reserva capacidad adicional.
+    \end{itemize}
+\end{itemize}
+\begin{tikzpicture}
+\tikzset{
+    bloque/.style={rectangle,draw=black, top color=white, bottom color=blue!50,
+                   very thick, inner sep=0.5em, minimum size=0.6cm, text centered, font=\tiny},
+    bloquelibre/.style={rectangle,draw=black, top color=white, bottom color=blue!10,
+                   very thick, inner sep=0.5em, minimum size=0.6cm, text centered, font=\tiny},
+    flecha/.style={->, >=latex', shorten >=1pt, thick},
+    etiqueta/.style={text centered, font=\tiny} 
+}  
+\node[bloque] (bsize) {2};
+\node[bloque, right=0cm of bsize] (bcap) {4};
+\node[bloque,right=0cm of bcap] (bptr) { };
+\node[bloque,right=0.5cm of bptr] (v0) {1.0};
+\node[bloque,right=0cm of v0] (v1) {2.0};
+\node[bloquelibre,right=0cm of v1] (v2) {?};
+\node[bloquelibre,right=0cm of v2] (v3) {?};
+\draw[flecha] (bptr) -- (v0);
+\node[etiqueta, left=0.1cm of bsize] {v1:};
+\node[etiqueta, above=0cm of bsize] {tam};
+\node[etiqueta, above=0cm of bcap] {cap};
+\node[etiqueta, above=0cm of bptr] {vec};
+\end{tikzpicture}
+\begin{itemize}
+  \item \pause \cppid{agrega\_final(1.5)}
+\end{itemize}
+\pause
+\begin{tikzpicture}
+\tikzset{
+    bloque/.style={rectangle,draw=black, top color=white, bottom color=blue!50,
+                   very thick, inner sep=0.5em, minimum size=0.6cm, text centered, font=\tiny},
+    bloquelibre/.style={rectangle,draw=black, top color=white, bottom color=blue!10,
+                   very thick, inner sep=0.5em, minimum size=0.6cm, text centered, font=\tiny},
+    flecha/.style={->, >=latex', shorten >=1pt, thick},
+    etiqueta/.style={text centered, font=\tiny} 
+}  
+\node[bloque] (bsize) {3};
+\node[bloque, right=0cm of bsize] (bcap) {4};
+\node[bloque,right=0cm of bcap] (bptr) { };
+\node[bloque,right=0.5cm of bptr] (v0) {1.0};
+\node[bloque,right=0cm of v0] (v1) {2.0};
+\node[bloque,right=0cm of v1] (v2) {1.5};
+\node[bloquelibre,right=0cm of v2] (v3) {?};
+\draw[flecha] (bptr) -- (v0);
+\node[etiqueta, left=0.1cm of bsize] {v1:};
+\node[etiqueta, above=0cm of bsize] {tam};
+\node[etiqueta, above=0cm of bcap] {cap};
+\node[etiqueta, above=0cm of bptr] {vec};
+\end{tikzpicture}
+\begin{itemize}
+  \item \pause \cppid{agrega\_final(2.5)}
+\end{itemize}
+\pause
+\begin{tikzpicture}
+\tikzset{
+    bloque/.style={rectangle,draw=black, top color=white, bottom color=blue!50,
+                   very thick, inner sep=0.5em, minimum size=0.6cm, text centered, font=\tiny},
+    bloquelibre/.style={rectangle,draw=black, top color=white, bottom color=blue!10,
+                   very thick, inner sep=0.5em, minimum size=0.6cm, text centered, font=\tiny},
+    flecha/.style={->, >=latex', shorten >=1pt, thick},
+    etiqueta/.style={text centered, font=\tiny} 
+}  
+\node[bloque] (bsize) {4};
+\node[bloque, right=0cm of bsize] (bcap) {4};
+\node[bloque,right=0cm of bcap] (bptr) { };
+\node[bloque,right=0.5cm of bptr] (v0) {1.0};
+\node[bloque,right=0cm of v0] (v1) {2.0};
+\node[bloque,right=0cm of v1] (v2) {1.5};
+\node[bloque,right=0cm of v2] (v3) {2.5};
+\draw[flecha] (bptr) -- (v0);
+\node[etiqueta, left=0.1cm of bsize] {v1:};
+\node[etiqueta, above=0cm of bsize] {tam};
+\node[etiqueta, above=0cm of bcap] {cap};
+\node[etiqueta, above=0cm of bptr] {vec};
+\end{tikzpicture}
+\end{frame}
+
+\begin{frame}
+\begin{tikzpicture}
+\tikzset{
+    bloque/.style={rectangle,draw=black, top color=white, bottom color=blue!50,
+                   very thick, inner sep=0.5em, minimum size=0.6cm, text centered, font=\tiny},
+    bloquelibre/.style={rectangle,draw=black, top color=white, bottom color=blue!10,
+                   very thick, inner sep=0.5em, minimum size=0.6cm, text centered, font=\tiny},
+    flecha/.style={->, >=latex', shorten >=1pt, thick},
+    etiqueta/.style={text centered, font=\tiny} 
+}  
+\node[bloque] (bsize) {4};
+\node[bloque, right=0cm of bsize] (bcap) {4};
+\node[bloque,right=0cm of bcap] (bptr) { };
+\node[bloque,right=0.5cm of bptr] (v0) {1.0};
+\node[bloque,right=0cm of v0] (v1) {2.0};
+\node[bloque,right=0cm of v1] (v2) {1.5};
+\node[bloque,right=0cm of v2] (v3) {2.5};
+\draw[flecha] (bptr) -- (v0);
+\node[etiqueta, left=0.1cm of bsize] {v1:};
+\node[etiqueta, above=0cm of bsize] {tam};
+\node[etiqueta, above=0cm of bcap] {cap};
+\node[etiqueta, above=0cm of bptr] {vec};
+\end{tikzpicture}
+\begin{itemize}
+  \item \pause \cppid{agrega\_final(3.5)}
+\end{itemize}
+\pause
+\begin{tikzpicture}
+\tikzset{
+    bloque/.style={rectangle,draw=black, top color=white, bottom color=blue!50,
+                   very thick, inner sep=0.5em, minimum size=0.6cm, text centered, font=\tiny},
+    bloquelibre/.style={rectangle,draw=black, top color=white, bottom color=blue!10,
+                   very thick, inner sep=0.5em, minimum size=0.6cm, text centered, font=\tiny},
+    flecha/.style={->, >=latex', shorten >=1pt, thick},
+    etiqueta/.style={text centered, font=\tiny} 
+}  
+\node[bloque] (bsize) {5};
+\node[bloque, right=0cm of bsize] (bcap) {8};
+\node[bloque,right=0cm of bcap] (bptr) { };
+
+\node[bloque,right=0.5cm of bptr] (v0) {1.0};
+\node[bloque,right=0cm of v0] (v1) {2.0};
+\node[bloque,right=0cm of v1] (v2) {1.5};
+\node[bloque,right=0cm of v2] (v3) {2.5};
+\node[etiqueta, right=0.5cm of v3] (delete) {\cppkey{delete[]}};
+\draw[flecha] (delete) -- (v3);
+
+\node[bloque,below right=0.5cm and 0.5cm of bptr] (nv0) {1.0};
+\node[bloque,right=0cm of nv0] (nv1) {2.0};
+\node[bloque,right=0cm of nv1] (nv2) {1.5};
+\node[bloque,right=0cm of nv2] (nv3) {2.5};
+\node[bloque,right=0cm of nv3] (nv4) {3.5};
+\node[bloquelibre,right=0cm of nv4] (nv5) {?};
+\node[bloquelibre,right=0cm of nv5] (nv6) {?};
+\node[bloquelibre,right=0cm of nv6] (nv7) {?};
+
+\draw[flecha] (bptr) -- (nv0);
+
+\node[etiqueta, left=0.1cm of bsize] {v1:};
+\node[etiqueta, above=0cm of bsize] {tam};
+\node[etiqueta, above=0cm of bcap] {cap};
+\node[etiqueta, above=0cm of bptr] {vec};
+\end{tikzpicture}
+\end{frame}
+
+\subsection{Un vector evolucionado}
+
+\mode<presentation>{
+
+\begin{frame}
+\begin{block}{vector.h}
+\lstinputlisting[lastline=20]{04-memmgmt/vec7/vector.h}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\begin{block}{vector.h}
+\lstinputlisting[firstline=22]{04-memmgmt/vec7/vector.h}
+\end{block}
+\end{frame}
+
+}
+
+\mode<article>{
+
+\begin{frame}
+\begin{block}{vector.h}
+\lstinputlisting{04-memmgmt/vec7/vector.h}
+\end{block}
+\end{frame}
+
+}
+
+\mode<presentation>{
+
+\begin{frame}
+\begin{block}{vector.cpp}
+\lstinputlisting[lastline=17]{04-memmgmt/vec7/vector.cpp}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\begin{block}{vector.cpp}
+\lstinputlisting[firstline=19,lastline=34]{04-memmgmt/vec7/vector.cpp}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\begin{block}{vector.cpp}
+\lstinputlisting[firstline=36,lastline=49]{04-memmgmt/vec7/vector.cpp}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\begin{block}{vector.cpp}
+\lstinputlisting[firstline=51,lastline=62]{04-memmgmt/vec7/vector.cpp}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\begin{block}{vector.cpp}
+\lstinputlisting[firstline=64]{04-memmgmt/vec7/vector.cpp}
+\end{block}
+\end{frame}
+
+}
+
+\mode<article>{
+\begin{frame}
+\begin{block}{vector.cpp}
+\lstinputlisting[lastline=15]{04-memmgmt/vec7/vector.cpp}
+\end{block}
+\end{frame}
+}
+
+\begin{frame}[fragile]
+\begin{block}{main.cpp}
+\mode<presentation>{
+\lstinputlisting[basicstyle=\tiny\ttfamily]{04-memmgmt/vec7/main.cpp}
+}
+\mode<article>{
+\lstinputlisting{04-memmgmt/vec7/main.cpp}
+}
+\end{block}
+\begin{block}{Salida}
+\begin{lstlisting}[style=terminal]
+v1: (1 2 3 4 )
+v2: (2.5 3.5 0 0 )
+v3: ()
+\end{lstlisting}
+\end{block}
+\end{frame}
+
