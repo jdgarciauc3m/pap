@@ -1,0 +1,202 @@
+\section{Operaciones de movimiento}
+
+\subsection{Introducción}
+
+\begin{frame}[fragile]{Intercambio de dos valores}
+\begin{itemize}
+  \item Función de intercambio para enteros
+\begin{lstlisting}
+void intercambia(int & x, int & y) {
+  int aux{x};
+  x = y;
+  y = aux;
+}
+
+int a = 2, b = 4;
+intercambia(a,b); // a=4, b=2
+\end{lstlisting}
+  \item Se realizan 3 copias de enteros.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{itemize}
+  \item Intercambio de vectores
+\begin{lstlisting}
+void intercambia(vector & v, vector & w) {
+  vector aux{v};
+  v = w;
+  w = aux;
+}
+\end{lstlisting}
+  \item Operaciones:
+    \begin{enumerate}
+      \item Construcción por copia de \cppid{aux} $\rightarrow$ 1 asignación de memoria.
+      \item Asignación a \cppid{x} $\rightarrow$ 1 desasignación + 1 asignación de memoria.
+      \item Asignación a \cppid{y} $\rightarrow$ 1 desasignación + 1 asignación de memoria.
+      \item Destrucción de \cppid{tmp} $\rightarrow$ 1 desasignación de memoria
+      \item 3 copias del vector elemento a elemento.
+    \end{enumerate}
+  \item Sin embargo:
+    \begin{itemize}
+      \item Sería suficiente con intercambiar tamaños y punteros
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{itemize}
+  \item Intercambio de vectores (si se tuviese acceso a implementación):
+\begin{lstlisting}
+void intercambia(vector & v, vector & w) {
+  unsigned long aux_tam{v.tam};
+  v.tam = w.tam;
+  w.tam = aux.tam;
+  double * aux_vec = v.vec;
+  v.vec = w.vec;
+  w.vec = aux.vec;
+}
+\end{lstlisting}
+  \item Operaciones:
+    \begin{enumerate}
+      \item 0 asignaciones de memoria.
+      \item 0 desasignaciones de memoria.
+      \item 3 copias de enteros (3 palabras).
+      \item 3 copias de puntero (3 palabras).
+      \item 0 copias de contenidos de vector.
+    \end{enumerate}
+  \item Sin embargo:
+    \begin{itemize}
+      \item Sería necesario acceder a la implementación.
+      \item Hay más casos de uso.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Operaciones de movimiento}
+\begin{itemize}
+  \item Una operación de movimiento adquiere los recursos de un objeto y lo deja en un estado válido, pero vacío.
+    \begin{itemize}
+      \item Lo único que se espera de un objeto después es que pueda destruirse.
+    \end{itemize}
+  \item Operaciones de movimiento:
+    \begin{itemize}
+      \item Constructor de movimiento: Mueve el objeto origen al objeto creado.
+      \item Asignación de movimiento: Mueve el objeto origen al objeto destino.
+    \end{itemize}
+  \item Orígenes de movimiento:
+    \begin{itemize}
+      \item Retorno de valores locales por copia.
+      \item Variables a las que se aplica \cppid{std::move()}.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Retorno de objetos locales}
+\begin{itemize}
+  \item Cuando una función devuelve una copia de un objeto local.
+\begin{lstlisting}
+string concatena(const string & a, const string & b) {
+  string tmp = a + " -- " + b;
+  return tmp; // Invoca una operación de movimiento.
+}
+
+x = concatena("Daniel", "Garcia");
+\end{lstlisting}
+  \item Se aprovecha el hecho de que \cppid{tmp} se va a destruir.
+    \begin{itemize}
+      \item Se transfieren los recursos al destino.
+        \begin{itemize}
+          \item Ejemplo: Copiando el valor del puntero.
+        \end{itemize}
+      \item Se deja al origen en un estado \emph{destruible}.
+        \begin{itemize}
+          \item Ejemplo: Haciendo el puntero \cppkey{nullptr}.
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Aplicación explicita de movimiento}
+\begin{itemize}
+  \item Cuando se invoca sobre una variable la operación \cppid{std::move()}.
+\begin{lstlisting}
+void f() {
+  string c = "Daniel";
+  string d = "Garcia";
+  d = std::move(c); // d == "Daniel", c == "Garcia" o vacía
+} // Destructores
+\end{lstlisting}
+  \item Se informa que una variable puede moverse.
+    \begin{itemize}
+      \item Son las operaciones de movimiento (constructor) y (asignación) las
+            que realizan el movimiento.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\subsection{Operaciones de movimiento}
+
+\begin{frame}[fragile]{Constructor de movimiento}
+\begin{itemize}
+  \item El \alert{constructor de movimiento} se invoca cuando se construye un objeto
+        a partir de una operación de movimiento.
+    \begin{itemize}
+      \item Toma un argumento de tipo \emph{referencia a r-valor}.
+    \end{itemize}
+\begin{lstlisting}
+vector(vector &&);
+\end{lstlisting}
+  \item Se puede suprimir la generación automática del constructor de movimiento.
+\begin{lstlisting}
+vector(vector &&) = delete;
+\end{lstlisting}
+  \item Se puede forzar la generación automática del constructor de movimiento.
+\begin{lstlisting}
+vector(vector &&) = default;
+\end{lstlisting}
+  \item Se invoca en contextos como:
+\begin{lstlisting}
+vector v = f(); // vector f();
+vector w = std::move(v);
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Operador de asignación de movimiento}
+\begin{itemize}
+  \item El \alert{operador de asignación de movimiento} se invoca cuando se asigna un objeto
+        a partir de una operación de movimiento.
+    \begin{itemize}
+      \item Toma un argumento de tipo \emph{referencia a r-valor}.
+    \end{itemize}
+\begin{lstlisting}
+vector & operator=(vector &&);
+\end{lstlisting}
+  \item Se puede suprimir la generación automática del operador de asignación de movimiento.
+\begin{lstlisting}
+vector & operator=(vector &&) = delete;
+\end{lstlisting}
+  \item Se puede forzar la generación automática del operador de asignación de movimiento.
+\begin{lstlisting}
+vector & operator=(vector &&) = default;
+\end{lstlisting}
+  \item Se invoca en contextos como:
+\begin{lstlisting}
+v = f(); // vector f();
+w = std::move(v);
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Implementación de constructor de movimiento}
+\begin{block}{vector.cpp}
+\lstinputlisting[firstline=35,lastline=41]{03-copymove/vec5/vector.cpp}
+\end{block}
+\end{frame}
+
+\begin{frame}{Implementación de asignación de movimiento}
+\begin{block}{vector.cpp}
+\lstinputlisting[firstline=43,lastline=47]{03-copymove/vec5/vector.cpp}
+\end{block}
+\end{frame}

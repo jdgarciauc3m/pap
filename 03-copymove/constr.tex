@@ -1,0 +1,305 @@
+\section{Constructores}
+
+\subsection{Tipos sin constructor}
+
+\begin{frame}[fragile]{Iniciación sin constructor}
+\begin{itemize}
+  \item Iniciación de tipos primitivos.
+\begin{lstlisting}
+int x{1024}; // int x = 1024
+double * p{nullptr}; // double * p = nullptr
+\end{lstlisting}
+  \item Clases que no tienen constructor:
+\begin{lstlisting}
+struct dispositivo {
+  string id_serie;
+  long long capacidad;
+};
+\end{lstlisting}
+    \begin{itemize}
+      \item Iniciación por miembros:
+\begin{lstlisting}
+dispositivo d1{"hda1", 1024};
+\end{lstlisting}
+      \item Iniciación por copia
+\begin{lstlisting}
+dispositivo d3{d1}; // Copia miembro a miembro
+\end{lstlisting}
+      \item Iniciación por defecto
+\begin{lstlisting}
+dispositivo d4{};
+dispositivo d5;
+\end{lstlisting}
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{itemize}
+  \item Si se usa iniciación por defecto:
+    \begin{itemize}
+      \item Variables globales $\rightarrow$ iniciación por defecto de miembros
+\begin{lstlisting}
+dispositivo d1; // id_serie="", capacidad=0
+dispositivo d2{}; // id_serie="", capaciad=0
+\end{lstlisting}
+      \item Variables locales $\rightarrow$ iniciación por defecto de miembros de tipo clase
+        \begin{itemize}
+          \item Miembros de tipos primitivos sin iniciar.
+        \end{itemize}
+\begin{lstlisting}
+void f() {
+  dispositivo d3; // id_serie="", capacidad=?
+  dispositivo d4{}; // id_sere="", capacidad=0
+}
+\end{lstlisting}
+    \end{itemize}
+  \item Se puede indicar valor por defecto para miembros.
+\begin{lstlisting}
+struct dispositivo {
+  string id_serie{"sda1"};
+  long long capacidad{1024};
+};
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+
+\subsection{Tipos con constructor}
+
+\begin{frame}[fragile]{Invocación al constructor}
+\begin{itemize}
+  \item Sin un tipo tiene uno o más constructores, todas las definiciones de objetos 
+        deben invocar algún constructor.
+    \begin{itemize}
+      \item El compilador deja de generar un constructor por defecto.
+    \end{itemize}
+\begin{lstlisting}
+struct complejo {
+  double real, imag;
+  complejo(double r);
+  complejo(double r, double i);
+};
+
+complejo c1; // Error
+complejo c2{}; // Error
+complejo c3{2.0}; // OK
+complejo c4{2.0, 3.5}; // OK
+complejo * pc = new complejo{2.0,3.5}; // OK
+complejo v[] { {1.0,1.5}, {2.0, 2.0} }; // OK
+vector<complejo> w { {1.0, 1.5}, {2.0, 2.0} }; // OK
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{itemize}
+  \item Existe una sintaxis para forzar la invocación de un constructor.
+    \begin{itemize}
+      \item No invoca iniciación miembro a miembro o basadas en lista.
+    \end{itemize}
+\begin{lstlisting}
+struct punto {
+  double x, y;
+};
+punto p1(1.0, 1.0); // Error: No hay constructor
+punto p2{1.0, 1.0}; // OK
+punto p3(1.0); // Error: No hay constructor
+punto p4{1.0}; // x=1.0, y=0.0
+complejo c1(1.0, 1.0); // OK
+complejo c2{1.0, 1.0}; // OK
+complejo c3(1.0); // OK
+complejo c4{1.0}; // OK
+\end{lstlisting}
+  \item Útil para discriminar entre constructores de \cppid{std::vector} de tipos numéricos.
+\begin{lstlisting}
+vector<int> v{10}; // Vector con el valor 10. v.size() == 1
+vector<int> v(10); // Vector con 10 valores 0. v.size() == 10
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+
+\subsection{Constructor por defecto}
+
+\begin{frame}[fragile]
+\begin{itemize}
+  \item El \alert{constructor vacío} o \alert{constructor por defecto} es un constructor que no toma ningún parámetro.
+\begin{lstlisting}
+vector();
+\end{lstlisting}
+  \item Define que debe hacerse:
+    \begin{itemize}
+      \item Cuando se define un objeto sin valor inicial.
+\begin{lstlisting}
+vector v;
+vector v{};
+\end{lstlisting}
+      \item Cuando se asigna memoria sin valor inicial
+\begin{lstlisting}
+vector * pv = new vector;
+\end{lstlisting}
+      \item El constructor vacío se genera si no hay ningún constructor.
+        \begin{itemize}
+          \item Se puede inhibir la generación del constructor vacío.
+\begin{lstlisting}
+vector() = delete;
+\end{lstlisting}
+          \item Se puede forzar la generación del constructor vacío.
+\begin{lstlisting}
+vector() = default;
+\end{lstlisting}
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Constructor por defecto y arrays}
+\begin{itemize}
+  \item El tipo base de un array debe tener constructor por defecto, si hace falta iniciar por defecto.
+\begin{lstlisting}
+struct punto {
+  double x, y;
+  punto();
+};
+struct complejo {
+  double real, imag;
+  complejo(double d, double i);
+};
+
+punto v[16]; // OK
+complejo w[16]; // Error: No pueden iniciarse elementos
+complejo z[] = { {1.0, 1.0}, {2.0, 2.0} }; // OK 
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Constructor por defecto y vectores}
+\begin{itemize}
+  \item El tipo base de un vector debe tener constructor por defecto, si hace falta iniciar por defecto.
+\begin{lstlisting}
+struct punto {
+  double x, y;
+  punto();
+};
+struct complejo {
+  double real, imag;
+  complejo(double d, double i);
+};
+
+vector<punto> vp1; // OK. No necesita iniciar
+vector<complejo> vc1; // OK. No necesita iniciar
+
+vector<punto> vp2(16); // OK. 16 elementos con valor por defecto
+vector<complejo> vc2(16); // Error: no puede iniciar 16 elementos
+vector<complejo> vc3{ {1.0, 1.0}, {2.0, 2.0} }; // OK
+vector<complejo> vc4{5, {1.0,1.0}}; // OK: 5 elementos iniciados
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+
+\subsection{Conversión y constructor explícito}
+
+\begin{frame}[fragile]{Constructor explícito}
+\begin{itemize}
+  \item Un constructor que toma un único argumento define una operación de conversión.
+\begin{lstlisting}
+class complejo {
+  complejo(double r, double i);
+  complejo(dobule r);
+  // ...
+};
+
+complejo c = 3.5; // Conversión a complejo
+\end{lstlisting}
+  \item Sin embargo:
+\begin{lstlisting}
+vector v = 5; // Conversión de entero a vector
+\end{lstlisting}
+  \item Se puede forzar a que un constructor no actúe como operación de conversión:
+\begin{lstlisting}
+explicit vector(int n);
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+
+\subsection{Constructor basado en lista}
+
+\begin{frame}[fragile]{Lista de iniciación}
+\begin{itemize}
+  \item Un \alert{constructor basado en lista} es un constructor que toma un único argumento de tipo
+        \cppid{std::initializer\_list}.
+    \begin{itemize}
+      \item Permiten definir la construcción de objetos a partir de una lista homogénea de valores.
+    \end{itemize}
+\begin{lstlisting}
+lista l { 1, 2, 3, 4 }; // Invoca a lista(initializer_list<int>)
+\end{lstlisting}
+  \item Cualquier función puede tomar como parámetro una lista de iniciación.
+    \begin{itemize}
+      \item El argumento debe pasarse por valor.
+    \end{itemize}
+\begin{lstlisting}
+int maximo(initializer_list<int> l);
+
+void f() {
+  x = maximo({1, 3, 4, 2});
+  // ...
+}
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{\texttt{initializer\_list}}
+\begin{itemize}
+  \item La clase \cppid{std::initializer\_list} ofrece funciones miembro para acceder a los valores de la lista:
+    \begin{itemize}
+      \item \cppid{begin()}: Puntero al principio de la lista.
+      \item \cppid{end()}: Puntero al final de la lista (siguiente del último).
+      \item \cppid{size()}: Tamaño de la lista.
+    \end{itemize}
+  \item Son suficientes para recorrer la lista:
+\begin{lstlisting}
+void imprime(std::initializer_list<int> l) {
+  for (auto p=l.begin(); p!=l.end(); ++p) {
+    cout << * p << endl;
+  }
+}
+\end{lstlisting}
+  \item O mejor:
+\begin{lstlisting}
+void imprime(std::initializer_list<int> l) {
+  for (auto x : l) {
+    cout << x << endl;
+  }
+}
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+
+\subsection{Constructores para \texttt{vector}}
+
+\begin{frame}{Constructores}
+\begin{itemize}
+  \item Constructor vacío
+  \item Constructor con tamaño pasa a ser explícito.
+  \item Constructor con lista de iniciación.
+\end{itemize}
+\begin{block}{vector.h}
+\mode<presentation>{
+\lstinputlisting[firstline=6,lastline=10]{03-copymove/vec2/vector.h}
+}
+\mode<article>{
+\lstinputlisting[firstline=6,lastline=10]{03-copymove/vec2/vector.h}
+}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\begin{block}{vector.cpp}
+\mode<presentation>{
+\lstinputlisting[lastline=16]{03-copymove/vec2/vector.cpp}
+}
+\mode<article>{
+\lstinputlisting{03-copymove/vec2/vector.cpp}
+}
+\end{block}
+\end{frame}

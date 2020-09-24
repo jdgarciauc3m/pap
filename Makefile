@@ -16,15 +16,18 @@ logos/logo-uc3m.jpg
 include guide/Makefile.def
 include 01-intro/Makefile.def
 include 02-fundcap/Makefile.def
+include 03-copymove/Makefile.def
 
 ALL_PARTS= \
 $(GUIDE_PARTS) \
 $(INTRO_PARTS) \
 $(FUNDCAP_PARTS) \
+$(COPYMOVE_PARTS) \
 
 ALL_SLIDES_FINAL_PDF= \
 $(FINAL_DIR)/$(INTRO_PDF) \
 $(FINAL_DIR)/$(FUNDCAP_PDF) \
+$(FINAL_DIR)/$(COPYMOVE_PDF) \
 
 ALL_FINAL_PDF=\
 $(FINAL_DIR) \
@@ -49,3 +52,4 @@ $(FINAL_DIR):
 include guide/Makefile.mk
 include 01-intro/Makefile.mk
 include 02-fundcap/Makefile.mk
+include 03-copymove/Makefile.mk

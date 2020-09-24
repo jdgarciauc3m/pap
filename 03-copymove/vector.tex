@@ -1,0 +1,95 @@
+\section{Desarrollo de un vector de números}
+
+\begin{frame}[t]{Objetivo}
+\begin{itemize}
+\item En esta unidad iremos incorporando los conceptos al desarrollo de un tipo \cppid{vector}.
+\item La idea es desarrollar un tipo con funcionalidad parecida a \cppid{vector<double>}.
+\end{itemize}
+\end{frame}
+
+\mode<presentation>{
+
+\begin{frame}
+\begin{block}{vector.h}
+\lstinputlisting[lastline=18]{03-copymove/vec1/vector.h}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\begin{block}{vector.h}
+\lstinputlisting[firstline=20]{03-copymove/vec1/vector.h}
+\end{block}
+\end{frame}
+
+}
+
+\mode<article>{
+
+\begin{frame}
+\begin{block}{vector.h}
+\lstinputlisting{03-copymove/vec1/vector.h}
+\end{block}
+\end{frame}
+
+}
+
+\mode<presentation>{
+
+\begin{frame}
+\begin{block}{vector.cpp}
+\lstinputlisting[lastline=14]{03-copymove/vec1/vector.cpp}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\begin{block}{vector.cpp}
+\lstinputlisting[firstline=16]{03-copymove/vec1/vector.cpp}
+\end{block}
+\end{frame}
+
+}
+
+\mode<article>{
+\begin{frame}
+\begin{block}{vector.cpp}
+\lstinputlisting[lastline=15]{03-copymove/vec1/vector.cpp}
+\end{block}
+\end{frame}
+}
+
+\begin{frame}
+\begin{block}{main.cpp}
+\lstinputlisting{03-copymove/vec1/main.cpp}
+\end{block}
+\mode<presentation>{
+\begin{itemize}
+\item \pause \alert{¿Problemas?}
+\end{itemize}
+}
+\end{frame}
+
+\begin{frame}[fragile]{Comprobación de memoria}
+\begin{itemize}
+  \item \alert{valgrind}: Conjunto de herramientas para realizar análisis dinámico de programas.
+  \item \alert{memcheck}: Herramienta para:
+    \begin{itemize}
+      \item Accesos indebidos a memoria.
+      \item Usos peligrosos de valore no iniciados.
+      \item Goteos de memoria.
+      \item Errores en liberación de memoria.
+    \end{itemize}
+  \item Invocación:
+\begin{lstlisting}[style=terminal]
+valgrind --tool=memcheck programa
+\end{lstlisting}
+\begin{lstlisting}[style=terminal]
+...
+==15344== HEAP SUMMARY:
+==15344==     in use at exit: 40 bytes in 1 blocks
+==15344==   total heap usage: 1 allocs, 0 frees, 40 bytes allocated
+==15344== LEAK SUMMARY:
+==15344==    definitely lost: 40 bytes in 1 blocks
+...
+\end{lstlisting}
+\end{itemize}
+\end{frame}
