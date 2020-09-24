@@ -1,0 +1,247 @@
+\section{Tarea a realizar}
+
+\subsection{Presentación general}
+
+En esta práctica se desarrollará un tipo que permita representar una matriz
+algebraica de números en coma flotante con las siguientes características:
+
+\begin{itemize}
+
+\item Construcción por defecto. Se construirá una matriz de 0 filas y 0
+columnas.
+
+\item Construcción a partir de un número de filas y un número de columnas. Este
+constructor deberá asignar suficiente espacio de memoria para almacenar todos
+los valores de la matriz.
+
+\item Constructores de copia y de movimiento.
+
+\item Operadores de asignación de copia y de movimiento.
+
+\item Destructor. Debe liberar la memoria de la matriz.
+
+\item Operador de acceso. Se sobrecargará el operador \cppid{()} tomando dos
+parámetros para los índices \cppid{i} y \cppid{j} a los que se quiere acceder.
+Los índices de la matriz empiezan en \cppid{0}.
+
+\item Función miembro \cppid{filas()} permite obtener el número de filas de la
+matriz.
+
+\item Función miembro \cppid{columnas()} permite obtener el número de columnas
+de la matriz.
+
+\item Operador \cppid{<{}<} para realizar la escritura de una matriz.
+
+\end{itemize}
+
+En cuanto a la representación interna para la matriz se usarán los siguientes
+datos miembro:
+
+\begin{itemize}
+\item \cppid{filas\_}: Número de filas de la matriz.
+\item \cppid{columnas\_}: Número de columnas de la matriz.
+\item \cppid{vec\_}: Un puntero a un bloque de memoria dinámica que contendrá
+todos los valores de la matriz. Cada valor será un número representado en doble
+precisión.
+\end{itemize}
+
+Por tanto el archivo de cabecera para la clase matriz tendrá la siguiente
+estructura:
+
+\begin{lstlisting}
+#ifndef MATRIZ_H
+#define MATRIZ_H
+
+namespace alglin {
+
+class matriz {
+public:
+  // Operaciones
+
+private:
+  int filas_;
+  int columnas_;
+  double * vec_;
+};
+
+}
+
+#endif
+\end{lstlisting}
+
+\subsection{Constructor por defecto}
+
+El constructor por defecto deberá crear una matriz de \cppid{0} fila y \cppid{0}
+columnas.
+
+Por tanto el siguiente código:
+
+\begin{lstlisting}
+void f() {
+  using namespace std;
+  matriz m;
+  cout << "Filas. " << m.filas() << "\n";
+  cout << "Columnas: " << m.columnas() << "\n";
+}
+\end{lstlisting}
+
+Imprimirá
+\begin{lstlisting}[style=terminal]
+Filas: 0
+Columnas: 0
+\end{lstlisting}
+
+\subsection{Constructor con tamaño}
+
+Este constructor toma un número de filas y un número de columnas, y reserva
+además espacio de memoria para los valores almancenados:
+
+Por tanto el siguiente código:
+
+\begin{lstlisting}
+void f() {
+  using namespace std;
+  matriz m{3,4};
+  cout << "Filas. " << m.filas() << "\n";
+  cout << "Columnas: " << m.columnas() << "\n";
+}
+\end{lstlisting}
+
+Imprimirá
+\begin{lstlisting}[style=terminal]
+Filas: 3
+Columnas: 4
+\end{lstlisting}
+
+\subsection{Acceso a los valores de una matriz}
+
+Para acceder a los valores de una matriz se sobrecargará el operador de llamada
+a función (\cppkey{operator}\cppid{()}) tomando dos parámetros: las posiciones
+\cppid{i} y \cppid{j} dentro de la matriz.
+
+Se deberán definir dos versiones (una constante y otra no constante).
+
+\begin{lstlisting}
+double operator()(int i, int j) const;
+double & operator() (int i, int j);
+\end{lstlisting}
+
+Como los datos se almacenan en un array unidimensional, la posición
+bidimensional $(i,j)$ se transformará en la posición unidimensional $i \dot cols
++ j$, donde $cols$ es el número de columnas de la matriz.
+
+Por tanto, el siguiente código:
+
+\begin{lstlisting}
+void f() {
+  matriz m{3,4};
+  m(1,2) = 1.5;
+  std::cout << "m[1,2] = " << m(1,2) << "\n";
+\end{lstlisting}
+
+Imprimirá:
+
+\begin{lstlisting}[style=terminal]
+m[1,2] = 1.5
+\end{lstlisting}
+
+\subsection{Destrucción}
+
+Debe comprobar que en todos los casos se libera adecuadamente la memoria,
+para ello puede utilizar la herramienta \emph{valgrind} tal y como se ilustra en
+el material de clase.
+
+\subsection{Operaciones de copia}
+
+Debe definirse un constructor de copia y un operador de asignación de copia, de
+modo que sea posible realizar las siguientes acciones.
+
+\begin{lstlisting}
+void f() {
+  matriz a{3,4};
+  a(1,2) = 0.5;
+  matriz b{a};
+  std::cout << "b(1,2) =" << b(1,2) << "\n";
+
+  matriz c{2,100};
+  c = a;
+  std::cout << "c.filas = " << c.filas() << "\n";
+  std::cout << "c.columnas = " << c.columnas() << "\n";
+  std::cout << "c(1,2) = " << c(1,2) << "\n";
+}
+\end{lstlisting}
+
+Este código imprimirá:
+
+\begin{lstlisting}[style=terminal]
+b(1,2) = 0.5
+c.filas = 3
+c.columnas = 4
+c(1,2) = 0.5
+\end{lstlisting}
+
+\subsection{Operaciones de movimiento}
+
+Debe definirse un constructor de movimiento y un operador de asignación de
+movimiento, de modo que sea posible realizar las siguientes acciones:
+
+\begin{lstlisting}
+void f() {
+  matriz a{3,4};
+  a(1,2) = 0.5;
+  matriz b{std::move(a)};
+  std::cout << "a.filas = " << a.filas() << "\n";
+  std::cout << "a.columnas = " << a.columnas() << "\n";
+  std::cout << "b.filas = " << b.filas() << "\n";
+  std::cout << "b.columnas = " << b.columnas() << "\n";
+  std::cout << "b(1,2) = " << b(1,2) << "\n";
+
+  matriz c;
+  c = std::move(b);
+  std::cout << "b.filas = " << b.filas() << "\n";
+  std::cout << "b.columnas = " << b.columnas() << "\n";
+  std::cout << "c.filas = " << c.filas() << "\n";
+  std::cout << "c.columnas = " << c.columnas() << "\n";
+  std::cout << "c(1,2) = " << c(1,2) << "\n";
+}
+\end{lstlisting}
+
+En este caso se imprimirá:
+
+\begin{lstlisting}[style=terminal]
+a.filas = 0
+a.columnas = 0
+b.filas = 3
+b.columnas = 4
+b(1,2) = 0.5;
+b.filas = 0
+b.columnas = 0
+c.filas = 3
+c.columnas = 4
+c(1,2) = 0.5;
+\end{lstlisting}
+
+\subsection{Operadr de inserción}
+
+El operador de inserción en flujos, escribirá la matriz fila a fila, separando
+los valores dentro de una línea por espacios y terminando cada línea con un
+salto de línea.
+
+Por tanto el siguiente código:
+
+\begin{lstlisting}
+void f() {
+  matriz a{2,2};
+  a(0,0) = 1.0;
+  a(0,1) = 2.0;
+  a(1,1) = 3.0;
+  std::cout << a;
+}
+\end{lstlisting}
+
+Imprimirá:
+
+\begin{lstlisting}[style=terminal]
+1.0 2.0
+0.0 3.0
+\end{lstlisting}
