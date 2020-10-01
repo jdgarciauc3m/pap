@@ -21,6 +21,7 @@ include 03-copymove/Makefile.def
 include 04-memmgmt/Makefile.def
 include 06-generic/Makefile.def
 include lab1-tdu/Makefile.def
+include lab2-smartptr/Makefile.def
 
 ALL_PARTS= \
 $(GUIDE_PARTS) \
@@ -30,6 +31,7 @@ $(COPYMOVE_PARTS) \
 $(MEMMGMT_PARTS) \
 $(GENERIC_PARTS) \
 $(LAB1_TDU_PARTS) \
+$(LAB2_SMARTPTR_PARTS) \
 
 ALL_SLIDES_FINAL_PDF= \
 $(FINAL_DIR)/$(INTRO_PDF) \
@@ -38,6 +40,7 @@ $(FINAL_DIR)/$(COPYMOVE_PDF) \
 $(FINAL_DIR)/$(MEMMGMT_PDF) \
 $(FINAL_DIR)/$(GENERIC_PDF) \
 $(FINAL_DIR)/$(LAB1_TDU_PDF) \
+$(FINAL_DIR)/$(LAB2_SMARTPTR_PDF) \
 
 ALL_FINAL_PDF=\
 $(FINAL_DIR) \
@@ -66,3 +69,4 @@ include 03-copymove/Makefile.mk
 include 04-memmgmt/Makefile.mk
 include 06-generic/Makefile.mk
 include lab1-tdu/Makefile.mk
+include lab2-smartptr/Makefile.mk
