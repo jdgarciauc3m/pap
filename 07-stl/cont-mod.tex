@@ -1,0 +1,47 @@
+\section{Operaciones de modificación}
+
+\begin{frame}[t,fragile]{Operaciones pila}
+\begin{itemize}
+  \item Aplicables a \cppid{vector}, \cppid{deque} y \cppid{list}.
+    \begin{itemize}
+      \item \cppid{c.push\_back(x)}: Añade el elemento \cppid{x} al final.
+      \item \cppid{c.pop\_back()}: Elimina el último elemento de \cppid{c}.
+    \end{itemize}
+\end{itemize}
+\begin{lstlisting}
+vector<complex<double>> v;
+for (double r,i; cin >> r >> i;) {
+  complex<double> c{r,i};
+  v.push_back(c);
+}
+\end{lstlisting}
+    \begin{itemize}
+      \item \cppid{c.emplace\_back(args)}: Añade un elemento al final y construye sobre él
+             un valor usando \cppid{args} como argumentos de constructor.
+    \end{itemize}
+\begin{lstlisting}
+vector<complex<double>> v;
+for (double r,i; cin >> r >> i;) {
+  v.emplace_back(r,i);
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[t,fragile]{Inserción}
+\begin{itemize}
+  \item Inserción:
+    \begin{itemize}
+      \item \cppid{it2 = c.insert(it,x)}: Inserta \cppid{x} antes de \cppid{it}.
+      \item \cppid{it2 = c.insert(it,n,x)}: Inserta \cppid{n} copias de \cppid{x} antes de \cppid{it}.
+      \item \cppid{it2 = c.insert(it,i,j)}: Inserta los valores del rango \cppid{[i,j)} antes de \cppid{it}.
+      \item \cppid{it2 = c.insert(it,{elems})}: Inserta los valores en la lista \cppid{elems} ANTES DE \cppid{it}.
+      \item \cppid{it2 = c.emplace(it,args)}: Inserta un valor después de \cppid{it} pasando a su constructor los argumentos \cppid{args}. 
+    \end{itemize}
+  \item Eliminación:
+    \begin{itemize}
+      \item \cppid{it2 = c.erase(it)}: Elimina valor en posición \cppid{it}.
+      \item \cppid{it2 = c.erase(i,j)}: Eliminar valores del rango \cppid{[i,j)}.
+      \item \cppid{c.clear()}: Elimina todos los elementos de \cppid{c}.
+    \end{itemize}
+\end{itemize}
+\end{frame}

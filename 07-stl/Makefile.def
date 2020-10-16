@@ -1,0 +1,9 @@
+STL_BASE= 07-stl
+STL_PARTS= \
+$(STL_BASE)/*.tex  \
+metadata.tex
+
+STL_OUT=07-stl
+STL_PDF=$(STL_OUT).pdf
+
+FINAL_STL_PDF=$(FINAL_DIR)/$(STL_PDF)

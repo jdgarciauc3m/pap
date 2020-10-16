@@ -1,0 +1,131 @@
+\section{Algoritmos modificantes}
+
+\begin{frame}[t,fragile]{Transformaciones}
+\begin{itemize}
+  \item \cppid{it = transform(i,f,o,fun)}: Aplica la función \cppid{fun(x)} a cada elemento
+        de la secuencia \cppid{[i,f)} 
+        y almacena el resultado en \cppid{[o,o+(f-i))}.
+  \item \cppid{it = transform(i,f,i2,o,fun)}: Aplica la función \cppid{fun(x,y)} a cada elemento
+        de las secuencias \cppid{[i,f)} y \cppid{[i2,i2+(f-i))} 
+        y almacena el resultado en \cppid{[o,o+(f-i))}.
+\end{itemize}
+\begin{lstlisting}
+void toupper(string & s) {
+  transform(s.begin(), s.end(), s.begin(), toupper); 
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[t,fragile]{Ejemplo: Suma de vectores}
+\begin{lstlisting}
+vector<double> sumavec(const vector<double> & x, const vector<double> & y) {
+  vector<double> r;
+  if (x.size() != y.size()) return r;
+  r.resize(x.size());
+  transform(x.begin(), x.end(), y.begin(), r.begin(),
+    [](double a, double b) { return a+b; }
+  );
+  return r;
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[t]{Copia}
+\begin{itemize}
+  \item \cppid{it = copy(i,f,o)}: Copia todos los elementos de \cppid{[i,f)} 
+        a partir de \cppid{o}.
+  \item \cppid{it = copy\_if(i,f,o,pred)}: Copia todos los elementos de \cppid{[i,f)} 
+        que cumplan el predicado \cppid{pred(x)} 
+        a partir de \cppid{o}.
+  \item \cppid{it = copy\_n(i,f,o)}: Copia los primeros \cppid{n} elementos de \cppid{[i,i+n)} 
+        a partir de \cppid{o}.
+  \item \cppid{it = copy\_backward(i,f,o)}: Copia todos los elementos de \cppid{[i,f)} 
+        a partir de \cppid{o},
+        realizando las copias de fin a principio.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{Movimiento}
+\begin{itemize}
+  \item \cppid{it = move(i,f,o)}: Mueve todos los elementos de \cppid{[i,f)} 
+        a partir de \cppid{o}.
+  \item \cppid{it = move\_backward(i,f,o)}: Mueve todos los elementos de \cppid{[i,f)} 
+        a partir de \cppid{o},
+        realizando las copias de fin a principio.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{Unique}
+\begin{itemize}
+  \item \cppid{it = unique(i,f)}: Reorganiza los elementos de forma que se mueven 
+        todos los duplicados al final.
+  \item \cppid{it = unique(i,f,pred)}:  Reorganiza los elementos de forma que se mueven 
+        todos los duplicados (según el criterio \cppid{pred(x,y)}) al final.
+  \item \cppid{it = unique\_copy(i,f,o)}: Copia los elementos de \cppid{[i,f)}
+        a partir de \cppid{o} saltando los duplicados.
+  \item \cppid{it = unique\_copy(i,f,o,pred)}: Copia los elementos de \cppid{[i,f)}
+        a partir de \cppid{o} saltando los duplicados y usando \cppid{pred(x,y)} como criterio.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{Eliminación}
+\begin{itemize}
+  \item \cppid{it = remove(i,f,v)}: Elimina los elementos con el valor \cppid{v} de la secuencia \cppid{[i,f)}.
+  \item \cppid{it = remove(i,f,pred)}: Elimina los elementos que cumplen \cppid{pred(x)} de la secuencia \cppid{[i,f)}.
+  \item \cppid{it = remove\_copy(i,f,o,v)}: Copia los elementos distintos de \cppid{v} desde la secuencia \cppid{[i,f)}
+        a la secuencia \cppid{[o,o+(f-i))}.
+  \item \cppid{it = remove\_copy\_if(i,f,o,pred)}: Copia los elementos que no cumplen \cppid{pred(x)} desde la secuencia \cppid{[i,f)}
+        a la secuencia \cppid{[o,o+(f-i))}.
+  \vfill
+  \item \alert{NOTA}: \emph{Eliminar} significa moverlos al final.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{Inversión}
+\begin{itemize}
+  \item \cppid{reverse(i,f)}: Invierte el orden de la secuencia \cppid{[i,f)}.
+  \item \cppid{reverse\_copy(i,f,o)}: Copia la secuencia \cppid{[i,f)} en orden inverso a partir de \cppid{o}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{Remplazo}
+\begin{itemize}
+  \item \cppid{replace(i,f,v1,v2)}: Sustituye todos los elementos con el valor \cppid{v1}
+        en la secuencia \cppid{[i,f)}
+        por el valor\cppid{v2}.
+  \item \cppid{replace(i,f,pred,v2)}: Sustituye todos los elementos que cumplen el predicado \cppid{pred(x)}
+        en la secuencia \cppid{[i,f)}
+        por el valor\cppid{v2}.
+  \item \cppid{it = replace\_copy(i,f,o,v1,v2)}: Copia la secuencia \cppid{[i,f)} a partir de \cppid{o}
+        sustituyendo las ocurrencias de \cppid{v1} por \cppid{v2}.
+  \item \cppid{it = replace\_copy(i,f,o,pred,v2)}: Copia la secuencia \cppid{[i,f)} a partir de \cppid{o}
+        sustituyendo las ocurrencias que cumplen \cppid{pred(x)} por \cppid{v2}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{Rotación, mezcla y partición}
+\begin{itemize}
+  \item Se puede realizar una rotación de los elementos de una secuencia (\cppid{rotate}, \cppid{rotate\_copy}).
+  \item Se pueden mezclar los valores de forma aleatoria (\cppid{random\_shuffle}, \cppid{shuffle}).
+  \item Se puede realizar una \emph{partición} de un conjunto de valores (\cppid{partition}, 
+        \cppid{stable\_partition}, \cppid{partition\_copy}, \cppid{partition\_point}, \cppid{is\_partition}).
+  \item Se pueden generar permutaciones (\cppid{next\_permutation}, \cppid{prev\_permutation}, \cppid{is\_permutation}).
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{Llenado}
+\begin{itemize}
+  \item \cppid{fill(i,f,v)}: Asigna \cppid{v} a cada elemento de \cppid{[i,f)}.
+  \item \cppid{it = fill\_n(i,n,v)}: Asigna \cppid{v} a cada elemento de \cppid{[i,i+n)}.
+  \item \cppid{generate(i,f,g)} Asigna el resultado de \cppid{g()} a cada elemento de \cppid{[i,f)}.
+  \item \cppid{it = generate(i,n,g)} Asigna el resultado de \cppid{g()} a cada elemento de \cppid{[i,i+n)}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{Intercambio}
+\begin{itemize}
+  \item \cppid{swap(x,y)}: Intercambia \cppid{x} e \cppid{y} (de cualquier tipo).
+  \item \cppid{it = swap\_ranges(i,f,i2)}: Intercambia los valores de \cppid{[i,f)} y \cppid{[i2, i2+(f-i))}.
+  \item \cppid{iter\_swap(i,j)}: Intercambia \cppid{*i} y \cppid{*j}
+\end{itemize}
+\end{frame}

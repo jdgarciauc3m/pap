@@ -1,0 +1,77 @@
+\section{Algoritmos no modificantes}
+
+\begin{frame}[t,fragile]{\texttt{for\_each}}
+\begin{itemize}
+  \item \cppid{rfun = for\_each(i, f, fun)} 
+        Aplica \cppid{fun(x)} a todos los valores en \cppid{[i,f)} devolviendo \cppid{fun}.
+\end{itemize}
+\vfill\pause
+\begin{lstlisting}
+void imprime(const vector<int> & v) {
+  for_each(v.begin(), v.end(), [](int x) {
+    cout << x << endl;
+  }
+}
+
+struct sumador {
+  double res = 0.0;
+  void operator()(double x) { res+=x; }
+};
+
+double suma(const vector<double> & v) {
+  sumador s = for_each(v.begin(), v.end(), sumador());
+  return s.res;
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[t,fragile]{Predicados sobre secuencias}
+\begin{itemize}
+  \item \cppid{all\_of(i,f,pred)}: Cierto si \cppid{pred(x)} cierto para todos los valores en \cppid{[i,f)}.
+  \item \cppid{none\_of(i,f,pred)}: Cierto si \cppid{pred(x)} falso para todos los valores en \cppid{[i,f)}.
+  \item \cppid{any\_of(i,f,pred)}: Cierto si \cppid{pred(x)} cierto para alguno de los valores en \cppid{[i,f)}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t,fragile]{Cuenta}
+\begin{itemize}
+  \item \cppid{n = count(i,f,v)}: Devuelve el número de valores en \cppid{[i,f)} iguales a \cppid{v}.
+  \item \cppid{n = count(i,f,pred)}: Devuelve el número de valores en \cppid{[i,f)} que cumplen \cppid{pred(x)}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t,fragile]{Búsqueda lineal (algunos)}
+\begin{itemize}
+  \item \cppid{it = find(i,f,v)}: Busca el primer elemento en \cppid{[i,f)} igual a \cppid{v}.
+  \item \cppid{it = find\_if(i,f,pred)}: Busca el primer elemento en \cppid{[i,f)} que cumple \cppid{pred(x)}.
+  \item \cppid{it = find\_if\_not(i,f,pred)}: Busca el primer elemento en \cppid{[i,f)} que no cumple \cppid{pred(x)}.
+  \item \cppid{it = find\_first\_of(i,f,i2,f2)}: Busca el primer elemento en \cppid{[i,f)} que es igual a algún elemento
+         de \cppid{[i2,f2)}.
+  \item \cppid{it = find\_first\_of(i,f,i2,f2,pred)}: Busca el primer elemento en \cppid{[i,f)} que 
+        cumple el predicado \cppid{pred(x,y)} con algún elemento de \cppid{[i2,f2)}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t,fragile]{Comparación de secuencias}
+\begin{itemize}
+  \item \cppid{equal(i,f,i2)}: Cierto si la secuencia \cppid{[i,f)} igual a \cppid{[i2,i2+(f-i))}.
+  \item \cppid{equal(i,f,i2,pred)}: Cierto si la secuencia \cppid{[i,f)} igual a \cppid{[i2,i2+(f-i))} según predicado \cppid{pred(x,y)}.
+  \item \cppid{pair(p1,p2) = mismatch(i,f,i2)}: El par \cppid{<p1,p2>} apunta a la primera no-coincidencia entre las dos
+        secuencias.
+  \item \cppid{pair(p1,p2) = mismatch(i,f,i2,pred)}: El par \cppid{<p1,p2>} apunta a la primera no-coincidencia entre las dos
+        secuencias según el preciado \cppid{pred(x,y)}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t,fragile]{Búsqueda de secuencias}
+\begin{itemize}
+  \item \cppid{it = search(i,f,i2,f2)}: Busca la primera ocurrencia de la secuencia \cppid{[i2,f2)} dentro
+        de la secuencia \cppid{[i,f)}.
+  \item \cppid{it = search(i,f,i2,f2,pred)}: Busca la primera ocurrencia de la secuencia \cppid{[i2,f2)} dentro
+        de la secuencia \cppid{[i,f)} según el predicado \cppid{pred(x,y)}.
+  \item \cppid{it = search(i,f,n,v)}: Busca la primera ocurrencia de \cppid{n} repeticiones del valor \cppid{v}
+        dentro de la secuencia \cppid{[i,f)}.
+  \item \cppid{it = search(i,f,n,v)}: Busca la primera ocurrencia de \cppid{n} repeticiones del valor \cppid{v}
+        dentro de la secuencia \cppid{[i,f)} según el predicado \cppid{pred(x,y)}.
+\end{itemize}
+\end{frame}

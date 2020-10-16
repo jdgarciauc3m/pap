@@ -1,0 +1,215 @@
+\section{Introducción}
+
+\begin{frame}[t]{¿Qué es un contenedor?}
+\begin{itemize}
+  \item Un \textgood{contenedor} es una estructura de datos capaz de almacenar objetos.
+  \vfill\pause
+  \item Tipos de contenedores:
+    \begin{itemize}
+      \item \textmark{Contenedores de secuencia}: Almacenan una secuencia de valores.
+      \item \textmark{Contenedores asociativos}: Almacenan pares \emph{clave}-\emph{valor}.
+    \end{itemize}
+  \vfill\pause
+  \item Tipos que son parcialmente contenedores:
+    \begin{itemize}
+      \item \textmark{Adaptadores de contenedor}: Acceso especializado a otro contenedor.
+      \item \textmark{Casi contenedores}: Ofrecen solo algunas de las propiedades de un contenedor.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t,fragile]{Contenedores y gestión de memoria}
+\begin{itemize}
+  \item Todos los contenedores de la biblioteca estándar toman como argumento de plantilla
+        un asignador de memoria (\emph{allocator}).
+    \begin{itemize}
+      \item Es un tipo \cppid{A} que abstrae la forma de gestionar la memoria.
+      \item Existe una clase por con un asignador básico (\cppid{std::allocator<T>}).
+      \item El tipo \cppid{std::alocator<T>} es el valor por defecto si no se pasa otro.
+    \end{itemize}
+\end{itemize}
+\vfill
+\begin{lstlisting}
+template <typename T, typename A=allocator<T>>
+class vector {
+  // ...
+};
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[t]{Contenedores de secuencia}
+\begin{itemize}
+  \item Almacenan una lista de valores de un determinado tipo.
+  \item Permiten acceder a los valores como una secuencia semi-abierta.
+  \vfill\pause
+  \item Tipos:
+    \begin{itemize}
+      \item \cppid{vector<T,A>}: Secuencia asignada de forma contigua.
+      \item \cppid{list<T,A>}: Lista de nodos doblemente enlazada.
+      \item \cppid{forward\_list<T,A>}: Lista de elementos simplemente enlazada.
+      \item \cppid{deque<T,A>}: Cola de doble extremo (\emph{deque}).
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{Contenedores asociativos}
+\begin{itemize}
+  \item Almacenando una colección de pares \emph{clave-valor} permitiendo buscar por clave.
+  \vfill\pause
+  \item Dos categorías:
+    \begin{itemize}
+      \item \textmark{Ordenados}: Las claves están sujetas a un criterio de ordenación.
+        \begin{itemize}
+          \item Típicamente implementadas mediante algún tipo de árbol.
+        \end{itemize}
+      \item \textmark{No-ordenados}: Las claves permiten la aplicación de una función \emph{hash}
+            y son comparables en igualdad.
+        \begin{itemize}
+          \item Típicamente implementadas mediante algún tipo de tabla \emph{hash}.
+        \end{itemize}
+    \end{itemize}
+  \vfill\pause
+  \item Alternativas en cuanto a claves:
+    \begin{itemize}
+      \item \textmark{Claves duplicadas}: Se pueden tener varios valores con la misma clave.
+      \item \textmark{Claves únicas}: No se puede tener más de un valor con la misma clave.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{Tipos para contenedores asociativos}
+\vspace{-1em}
+\begin{itemize}
+  \item Tipos \textgood{ordenados}:
+    \begin{itemize}
+      \item \cppid{map<K,V,C,A>}: Secuencia de pares \cppid{<K,V>} sin claves duplicadas.
+      \item \cppid{multimap<K,V,C,A>}: Secuencia de pares \cppid{<K,V>} con claves duplicadas.
+      \item \cppid{set<K,C,A>}: Conjunto de valores \cppid{<K>} sin duplicados.
+      \item \cppid{multi\_set<K,C,A>}: Conjunto de valores \cppid{<K>} con duplicados.
+    \end{itemize}
+  \vfill\pause
+  \item Tipos \textgood{no ordenados}:
+    \begin{itemize}
+      \item \cppid{unordered\_map<K,V,C,A>}: Colección de pares \cppid{<K,V>} sin claves duplicadas.
+      \item \cppid{unordered\_multimap<K,V,C,A>}: Colección de pares \cppid{<K,V>} con claves duplicadas.
+      \item \cppid{unordered\_set<K,C,A>}: Conjunto de valores \cppid{<K>} sin duplicados.
+      \item \cppid{unordered\_multiset<K,C,A>}: Conjunto de valores \cppid{<K>} con duplicados.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{Adaptadores de contenedores}
+\begin{itemize}
+  \item Suministran una interfaz especializada a partir de otro contenedor.
+  \item Tipos:
+    \begin{itemize}
+      \item \cppid{stack<T,C>}: Ofrece una interfaz de pila para un contenedor \cppid{C} y 
+            valores de tipo \cppid{T}.
+      \item \cppid{queue<T,C>}: Ofrece una interfaz de cola para un contenedor \cppid{C} y 
+            valores de tipo \cppid{T}.
+      \item \cppid{priority\_queue<T,C,Cmp>}: Ofrece una interfaz de cola con prioridades 
+            para un contenedor \cppid{C} y valores de tipo \cppid{T}. El criterio \cppid{Cmp}
+            se usa para ordenar por prioridades.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{Casi contenedores}
+\begin{itemize}
+  \item Son tipos que la biblioteca estándar puede tratar en muchos contextos como un
+        contenedor.
+  \item Tipos de \emph{array}:
+    \begin{itemize}
+      \item \cppid{T[N]}: Array primitivo de tamaño \cppid{N}.
+        \begin{itemize}
+          \item No tiene funciones miembro (\cppid{begin()}, \cppid{end()}, size(), \ldots).
+        \end{itemize}
+      \item \cppid{array<T,N>}: Evoltorio para array con algunas funciones.
+      \item \cppid{valarray<T>}: Vector numérico posiblemente con operaciones vectorizadas.
+    \end{itemize}
+  \item Tipos de cadena:
+    \begin{itemize}
+      \item \cppid{basic\_string<C,T,A>}: Tipo cadena para cualquier tipo carácter \cppid{C}.
+      \item \cppid{string}, \cppid{u16string}, \cppid{u32string}, \cppid{wstring}.
+    \end{itemize}
+  \item Manipulación de bits:
+    \begin{itemize}
+      \item \cppid{bitset<N>}: Conjunto de \cppid{N} bits.
+      \item \cppid{vector<bool>}: Especialización de \cppid{vector} con representación compacta.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t,fragile]{Tipos miembro}
+\begin{itemize}
+  \item Todos los contenedores contienen una serie de definiciones de sinómimos de tipo.
+    \begin{itemize}
+      \item Simplifican la programación genérica.
+    \end{itemize}
+\end{itemize}
+\begin{block}{Ejemplo}
+\begin{lstlisting}
+//...
+vector<contrapartida>::size_type n = obten_tam();
+vector<contrapartida> res(n);
+rellena(res);
+for (vector<contrapartida>::iterator i= res.begin(); i!=res.end();++i) {
+  i->normaliza_valores();
+}
+//...
+\end{lstlisting}
+\end{block}
+\pause
+\begin{itemize}
+  \item Muchos usos hoy día innecesarios gracias a \cppkey{auto}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{Tipos miembro para todos}
+\begin{itemize}
+  \item Sinónimos para tipos del valor:
+  \begin{itemize}
+    \item \cppid{value\_type}: Tipo de valor almacenado.
+    \item \cppid{reference}: Sinónimo \cppid{value\_type\&}.
+    \item \cppid{const\_reference}: Sinónimo \cppid{const value\_type\&}.
+    \item \cppid{pointer}: Sinónimo \cppid{value\_type*}.
+    \item \cppid{const\_pointer}: Sinónimo \cppid{const value\_type*}.
+  \end{itemize}
+  \item Tipos para asignador y tamaño:
+  \begin{itemize}
+    \item \cppid{allocator\_type}: Tipo del asignador usado.
+    \item \cppid{size\_type}: Tipo para representar el tamaño.
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{Tipos miembro para todos (iteradores)}
+\begin{itemize}
+  \item Sinónimos para tipos que permiten recorrer contenedores.
+  \begin{itemize}
+    \item \cppid{iterator}: Tipo iterador que se comporta como \cppid{value\_type*}.
+    \item \cppid{const\_iterator}: Tipo iterador que se comporta como \cppid{const value\_type*}.
+    \item \cppid{reverse\_iterator}: Tipo iterador que se comporta como \cppid{value\_type*}.
+    \item \cppid{const\_reverse\_iterator}: Tipo iterador que se comporta como \cppid{const value\_type*}.
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{Tipos miembro para contenedores asociativos}
+\begin{itemize}
+  \item Sinónimos para todos los contenedores asociativos:
+    \begin{itemize}
+      \item \cppid{key\_type}: Tipo para la clave.
+      \item \cppid{mapped\_type}: Tipo para el valor.
+      \item \cppid{key\_compare}: Tipo para el criterio de comparación.
+    \end{itemize}
+  \vfill\pause
+  \item Sinónimos solamente para los contenedores asociativos no ordenados:
+    \begin{itemize}
+      \item \cppid{hasher}: Tipo para la función \emph{hash}.
+      \item \cppid{key\_equal}: Tipo para el criterio de comparación.
+      \item \cppid{local\_iterator}: Tipo para el iterador dentro de una categoría.
+      \item \cppid{const\_local\_iterator}: Tipo para el iterador constante dentro de una categoría.
+    \end{itemize}
+\end{itemize}
+\end{frame}

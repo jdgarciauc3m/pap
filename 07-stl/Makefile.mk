@@ -1,0 +1,2 @@
+$(FINAL_STL_PDF): $(STL_PARTS) $(CONFIG_INPUT) $(IMG_INPUT)
+	$(LATEXMK) -jobname=$(STL_OUT) $(STL_BASE)/slides.tex

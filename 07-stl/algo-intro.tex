@@ -1,0 +1,63 @@
+\section{Introducción a algoritmos}
+
+\begin{frame}[t,fragile]{Secuencias}
+\begin{itemize}
+  \item Algoritmos sobre secuencias:
+    \begin{itemize}
+      \item En vez de operar sobre contenedores los algoritmos operan sobre secuencias.
+    \end{itemize}
+  \item Concepto de secuencia:
+    \begin{itemize}
+      \item Una especificación de una sucesión de valores de un contenedor.
+      \item Especificadas mediante un par de iteradores como rango semiabierto \cppid{[inicio,fin)}.
+    \end{itemize}
+\end{itemize}
+\begin{lstlisting}
+sort(c1.begin(), c1.end()); 
+sort(c2.begin(), c2.end());
+sort(c3.begin(), c3.begin()+5);
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[t,fragile]{Uso de políticas}
+\begin{itemize}
+  \item Algunos algoritms toman una política como argumento adicional.
+\end{itemize}
+\begin{lstlisting}
+template <typename I>
+void sort(I first, I last);
+
+template <typename I, typename C>
+void sort(I first, I last, C cmp);
+
+vector<int> v = obten_vector();
+sort(v.begin(), v.end()); // Ordena con <
+sort(v.begin(), v.end(), 
+  [](int x, int y) { return abs(x) < abs(y); });
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[t]{Clasificación de algoritmos}
+\begin{itemize}
+  \item Algoritmos de secuencia no modificantes.
+    \begin{itemize}
+      \item Usan como entrada los valores de una secuencia.
+    \end{itemize}
+  \item Algoritmos de secuencia modificantes.
+    \begin{itemize}
+      \item Modifican los valores de una secuencia.
+    \end{itemize}
+  \item Algoritmos de ordenación y búsqueda.
+    \begin{itemize}
+      \item Reorganizan una secuencia o buscan sobre ella.
+    \end{itemize}
+  \item Algoritmos de mínimo y máximo.
+    \begin{itemize}
+      \item Obtienen el mínimo el máximo o ambos.
+    \end{itemize}
+  \item Algoritmos numéricos.
+    \begin{itemize}
+      \item Realizan cálculos sobre una secuencia de números.
+    \end{itemize}
+\end{itemize}
+\end{frame}

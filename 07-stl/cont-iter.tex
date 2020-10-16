@@ -1,0 +1,45 @@
+\section{Iteradores}
+
+\begin{frame}[t]{¿Qué es un iterador?}
+\begin{itemize}
+  \item Es un valor que permite recorrer las posiciones de un contendor.
+  
+  \vfill
+  \item Operaciones mínimas:
+    \begin{itemize}
+      \item Acceder al objeto apuntado (\cppid{*i}).
+      \item Avanzar al siguiente elemento (\cppid{++i}).
+      \item Comprar dos iteradores (\cppid{i!=j}).
+    \end{itemize}
+
+  \vfill
+  \item Posiciones especiales:
+    \begin{itemize}
+      \item \textmark{Inicio}: Apunta al primer elemento.
+      \item \textmark{Fin}: Apunta a uno despúes del último elemento.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t,fragile]{Iteradores a partir de contenedor}
+\begin{itemize}
+  \item \cppid{begin()} y \cppid{end()}: Inicio y fin de contenedor.
+  \item \cppid{cbegin()} y \cppid{cend()}: Inicio y fin constantes.
+  \item \cppid{rbegin()} y \cppid{rend()}: Inicio y fin en orden inverso.
+  \item \cppid{crbegin()} y \cppid{crend()}: Inicio y fin constantes en orden inverso.
+\end{itemize}
+\vfill\pause
+\begin{lstlisting}
+for (vector<int>::iterator i=v.begin(); i!=v.end(); ++i) {
+  cout << *i << endl;
+}
+
+for (auto j=v.begin(); j!=v.end(); ++j) {
+  cout << *j << endl;
+}
+
+for (auto & x : v) {
+  cout << x << endl;
+}
+\end{lstlisting}
+\end{frame}

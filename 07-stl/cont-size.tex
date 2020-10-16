@@ -1,0 +1,42 @@
+\section{Tamaño y capacidad}
+
+\begin{frame}[t,fragile]{Tamaño del contenedor}
+\begin{itemize}
+  \item Todos los cotenedores tienen asociado:
+    \begin{itemize}
+      \item Un \textmark{tamaño} o número actual de elementos.
+      \item Un \textmark{tamaño máximo} o número máximo de elementos.
+    \end{itemize}
+\end{itemize}
+\vfill
+\begin{lstlisting}
+vector<int> v{1,2,3,4,5};
+n = v.size(); // n==5
+
+if (v.empty()) { cout << "vacio" << endl; }
+
+cout << "max: " << v.max_size() << endl;
+
+v.clear(); // Erase all elements. size==0
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[t,fragile]{Capacidad del contenedor}
+\begin{itemize}
+  \item Algunos contenedores (\cppid{vector}, \cppid{string}) tienen asociada una \textmark{capacidad}:
+    \begin{itemize}
+      \item Número máximo de elementos sin necesidad de nuevas asignaciones de memoria.
+    \end{itemize}
+\end{itemize}
+\begin{lstlisting}
+vector<int> v{1,2,3,4,5};
+v = v.capacity(); // Capacidad actual
+
+v.reserve(50); // v tiene capacidad para hasta 50 elem.
+
+v.resize(10); // Cambia tamaño a 10, añadiendo valor por defecto
+v.resize(15,42); // Cambia a tamaño, añadiendo valor 42
+
+v.shrint_to_fit(); // v tiene capacidad igual v.size()
+\end{lstlisting}
+\end{frame}

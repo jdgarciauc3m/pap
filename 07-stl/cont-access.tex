@@ -1,0 +1,49 @@
+\section{Acceso a elementos}
+
+\begin{frame}[t,fragile]{Acceso en contenedores de secuencia}
+\begin{itemize}
+  \item Acceso a los extremos:
+    \begin{itemize}
+      \item \cppid{c.front()}: Primer elemento.
+      \item \cppid{c.back()}: Último elemento (excepto \cppid{forward\_list}).
+    \end{itemize}
+
+  \vfill\pause
+  \item Acceso indexado (excepto listas):
+    \begin{itemize}
+      \item \cppid{c[n]}: Acceso al elemento n-ésimo. Sin verificación.
+      \item \cppid{c.at(n)}: Acceso al elemento n-ésimo. Con verificación.
+    \end{itemize}
+\end{itemize}
+\begin{lstlisting}
+vector<double> v{1.0, 1.5, 2.5, 4.0};
+double a = v.front(); // a==1.0
+double b = v.back();  // a==4.0
+v[2]=33.3; {1.0, 1.5, 33.3, 4.0}
+double c = v[0]; //c==1.0
+
+c[8]=1.0; // No definido
+c.at(8); // throw out_of_range{}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[t,fragile]{Acceso en contenedores asociativos}
+\begin{itemize}
+  \item Acceso indexado por clave (solamente \cppid{map} y \cppid{unordered\_map}).
+    \begin{itemize}
+      \item \cppid{c[k]}: Acceso al elemento con clave \cppid{k}.
+        \begin{itemize}
+          \item Si no encuentra \cppid{k}, inserta el par \cppid{<k,V{}>}.
+        \end{itemize}
+      \item \cppid{c.at(k)}: Acceso al elemento con clave \cppid{k}.
+        \begin{itemize}
+          \item Si no encuentra \cppid{k}, lanza \cppid{out\_of\_range}.
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+\begin{lstlisting}
+map<string,double> nota;
+nota["carlos"]=9;
+cout << nota.at("carlos") << endl;
+\end{lstlisting}
+\end{frame}
