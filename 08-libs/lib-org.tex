@@ -1,0 +1,103 @@
+\section{Organización de bibliotecas}
+
+\begin{frame}[t]{Espacios de nombres}
+\begin{itemize}
+  \item Un espacio de nombres permite organizar los nombres de las entidades que se definen.
+    \begin{itemize}
+      \item Evita tener que usar reglas de nombrado para dar nombres únicos a clases, tipos, funciones, \ldots
+      \item Ejemplo: Toda la biblioteca estándar definida en espacio de nombres \cppid{std}.
+    \end{itemize}
+
+  \vfill
+  \item Consejos:
+    \begin{itemize}
+      \item No definir nada en espacio de nombres global.
+      \item Usar uno o más espacios de nombre por biblioteca.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t,fragile]{Ejemplo}
+\begin{columns}
+
+\column{.5\textwidth}
+
+\begin{block}{hora.h}
+\begin{lstlisting}
+#ifndef CALENDAR_HORA_H
+#define CALENDAR_HORA_H
+
+namespace calendar {
+
+  class hora {
+    // ...
+  };
+
+}
+
+#endif
+\end{lstlisting}
+\end{block}
+
+\column{.5\textwidth}
+
+\begin{block}{fecha.h}
+\begin{lstlisting}
+#ifndef CALENDAR_FECHA_H
+#define CALENDAR_FECHA_H
+
+namespace calendar {
+
+  class fecha {
+    // ...
+  };
+
+}
+
+#endif
+\end{lstlisting}
+\end{block}
+
+\end{columns}
+\end{frame}
+
+\begin{frame}[t,fragile]{Espacios de nombre anonimos}
+\begin{itemize}
+  \item Un espacio de nombres anónimo define un espacio de nombres que solamente es visible
+        por la unidad de traducción actual.
+    \begin{itemize}
+      \item Los símbolos definidos en él tienen enlace interno y no son accesibles desde otras
+            unidades de traducción.
+      \item Útil para definir funciones, clases, variables internas a una unidad de traducción.
+    \end{itemize}
+\end{itemize}
+\begin{columns}
+
+\column{.5\textwidth}
+
+\begin{block}{modulo.h}
+\begin{lstlisting}
+#ifndef MODULO_H
+#define MODULO_H
+
+void f();
+
+#endif
+\end{lstlisting}
+\end{block}
+
+\column{.5\textwidth}
+
+\begin{block}{modulo.cpp}
+\begin{lstlisting}
+#include "modulo.h"
+
+namespace {
+void g() { /*...*/ }
+}
+void f() { /*...*/ }
+\end{lstlisting}
+\end{block}
+
+\end{columns}
+\end{frame}

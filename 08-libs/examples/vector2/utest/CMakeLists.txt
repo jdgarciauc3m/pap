@@ -1,0 +1,18 @@
+find_package(GTest REQUIRED)
+
+set(CMAKE_BUILD_TYPE "Debug")
+
+set(PROJECT_TEST_NAME ${PROJECT_NAME_STR}_utest)
+file(GLOB TEST_SRC_FILES 
+    ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src/*.cpp)
+
+include_directories(${GTEST_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/include)
+add_executable(${PROJECT_TEST_NAME} ${TEST_SRC_FILES})
+target_link_libraries(${PROJECT_TEST_NAME} 
+    ${GTEST_BOTH_LIBRARIES} 
+    ${GTEST_MAIN_LIBRARY} 
+    ${GTEST_LIBRARY})
+
+GTEST_ADD_TESTS(${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_TEST_NAME} 
+    "" ${TEST_SRC_FILES})

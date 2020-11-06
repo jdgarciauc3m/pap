@@ -1,0 +1,9 @@
+LIBS_BASE= 08-libs
+LIBS_PARTS= \
+$(LIBS_BASE)/*.tex  \
+metadata.tex
+
+LIBS_OUT=08-libs
+LIBS_PDF=$(LIBS_OUT).pdf
+
+FINAL_LIBS_PDF=$(FINAL_DIR)/$(LIBS_PDF)

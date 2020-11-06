@@ -1,0 +1,375 @@
+\section{Pruebas unitaras: Google Test}
+
+\subsection{Introducción a Google Test}
+
+\begin{frame}[t]{¿Qué es Google Test?}
+\begin{itemize}
+  \item Es una biblioteca para realizar pruebas unitarias en C++.
+  
+  \vfill
+  \item \textenum{Características}:
+    \begin{itemize}
+      \item Un framework tipo \textmark{xUnit}.
+      \item Descubrimiento de tests.
+      \item Variedad de aserciones.
+      \item Aserciones definidas por el usuario.
+      \item \emph{Death tests}.
+      \item Fallos fatales y no fatales.
+      \item Tests parametrizados por valor.
+      \item Tests parametrizados por tipo.
+      \item Múltiples opciones de ejecución.
+      \item Generación de informes en XML.
+    \end{itemize}
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{Uso}
+\begin{itemize}
+  \item \textenum{Plataformas}:
+    \begin{itemize}
+      \item Linux
+      \item Mac OS X
+      \item Windows
+      \item Cygwin
+      \item MinGW
+      \item Windows Mobile
+      \item Symbian
+    \end{itemize}
+  \vfill
+  \item Algunos proyectos que lo \textenum{usan}:
+    \begin{itemize}
+      \item Proyecto \textmark{Chromium}.
+      \item Familia de compiladores \textmark{LLVM}.
+      \item \textmark{Protocol Buffers}.
+      \item \textmark{OpenCV}.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{Principios}
+\begin{enumerate}
+  \item Las pruebas deberían ser \textmark{independientes} y \textmark{repetibles}.
+  \item Las pruebas deberían poder estar bien \textmark{estructuradas}.
+  \item Las pruebas deberían ser \textmark{portables} y \textmark{reusables}.
+  \item Ante un fallo en una prueba se debería poder obtener la \textmark{máxima información}.
+  \item No debería ser necesario escribir \textmark{código innecesario} para pruebas.
+  \item Las pruebas deberían ser \textmark{rápidas}.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[t,fragile]{¿Como obtener GTest?}
+\begin{itemize}
+  \item Repositorio en GitHub.
+    \begin{itemize}
+      \item \url{https://github.com/google/googletest}
+    \end{itemize}
+  \vfill
+  \item Se puede obtener como paquete (Ubuntu/Linux).
+    \begin{itemize}
+      \item Paquete: \cppid{libgtest-dev}.
+      \item \textbad{Importante}: No instala binarios, solamente fuentes.
+    \end{itemize}
+\end{itemize}
+\begin{lstlisting}[style=terminal]
+$ git clone git@github.com:google/googletest.git
+$ cd googletest
+$ mkdir build
+$ cd build
+$ cmake ..
+$ make -j3
+$ sudo make install
+\end{lstlisting}
+\end{frame}
+
+\subsection{Ejemplo 1: vectint}
+
+\begin{frame}[t]{Un vector de enteros}
+\begin{itemize}
+  \item Comencemos con una clase sencilla
+  \item Un vector de enteros con comportamiento mínimo:
+    \begin{itemize}
+      \item Un vector de enteros con tamaño (\cppid{size()}) y capacidad (\cppid{capacity()}).
+      \item Versión mínima que soporte copia y movimiento.
+      \item Acceso \cppkey{operator[]}.
+      \item Modificación de capacidad (\cppid{reserve()}). 
+      \item Modificación de tamaño (\cppid{resize()}). 
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{Interfaz}
+\begin{block}{include/vectint.h}
+\lstinputlisting[lastline=15]{08-libs/examples/vector1/include/vectint.h}
+\end{block}
+\end{frame}
+
+\begin{frame}[t]{Interfaz}
+\begin{block}{include/vectint.h}
+\lstinputlisting[firstline=16,lastline=26]{08-libs/examples/vector1/include/vectint.h}
+\end{block}
+\end{frame}
+
+\begin{frame}[t]{Interfaz}
+\begin{block}{include/vectint.h}
+\lstinputlisting[firstline=27]{08-libs/examples/vector1/include/vectint.h}
+\end{block}
+\end{frame}
+
+\begin{frame}[t]{Implementación}
+\begin{block}{src/vectint.cpp}
+\lstinputlisting[lastline=12]{08-libs/examples/vector1/src/vectint.cpp}
+\end{block}
+\end{frame}
+
+\begin{frame}[t]{Implementación}
+\begin{block}{src/vectint.cpp}
+\lstinputlisting[firstline=13,lastline=27]{08-libs/examples/vector1/src/vectint.cpp}
+\end{block}
+\end{frame}
+
+\begin{frame}[t]{Implementación}
+\begin{block}{src/vectint.cpp}
+\lstinputlisting[firstline=29,lastline=43]{08-libs/examples/vector1/src/vectint.cpp}
+\end{block}
+\end{frame}
+
+\begin{frame}[t]{Implementación}
+\begin{block}{src/vectint.cpp}
+\lstinputlisting[firstline=44]{08-libs/examples/vector1/src/vectint.cpp}
+\end{block}
+\end{frame}
+
+\begin{frame}[t]{Programa de prueba}
+\begin{columns}[T]
+
+\column{.5\textwidth}
+\begin{block}{samples/main1.cpp}
+\lstinputlisting[lastline=13]{08-libs/examples/vector1/samples/main1.cpp}
+\end{block}
+
+\column{.5\textwidth}
+\begin{block}{samples/main1.cpp}
+\lstinputlisting[firstline=14]{08-libs/examples/vector1/samples/main1.cpp}
+\end{block}
+
+\end{columns}
+\end{frame}
+
+\subsection{Usando CMake}
+
+\begin{frame}[t]{¿Qué es CMake}
+\begin{itemize}
+  \item Es un conjunto de herramientas que permite construir, probar
+        y empaquetar software.
+  
+    \begin{itemize}
+      \item A partir de un proyecto CMake se pueden generar scripts de
+            construcción para cada plataforma.
+    \end{itemize}
+
+  \item Generadores:
+    \begin{itemize}
+      \item Makefiles (Unix, Borland, MinGW, NMake).
+      \item Ninja.
+      \item Visual Studio.
+      \item Xcode.
+      \item Varios IDE:  CodeBlocks, CodeLite, EclipseCDT, KDevelop.
+      \item IDE con soporte nativo: CLion, Visual Studio 2017 RC1.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{CMake raíz}
+\vspace{-1em}
+\begin{block}{CMakeLists.txt}
+\lstinputlisting[basicstyle=\tiny]{08-libs/examples/vector1/CMakeLists.txt}
+\end{block}
+\end{frame}
+
+\begin{frame}[t]{CMake para src}
+\begin{block}{src/CMakeLists.txt}
+\lstinputlisting{08-libs/examples/vector1/src/CMakeLists.txt}
+\end{block}
+\end{frame}
+
+\begin{frame}[t]{CMake para samples}
+\begin{block}{samples/CMakeLists.txt}
+\lstinputlisting{08-libs/examples/vector1/samples/CMakeLists.txt}
+\end{block}
+\end{frame}
+
+\begin{frame}[t,fragile]{Construyendo con CMake}
+\begin{lstlisting}[style=terminal,basicstyle=\tiny\ttfamily]
+jdgarcia@gavilan:~/vector1$ mkdir build
+jdgarcia@gavilan:~/vector1$ cd build/
+jdgarcia@gavilan:~/vector1/build$ cmake ..
+-- The C compiler identification is GNU 6.2.0
+-- The CXX compiler identification is GNU 6.2.0
+-- Check for working C compiler: /usr/bin/cc
+-- Check for working C compiler: /usr/bin/cc -- works
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++
+-- Check for working CXX compiler: /usr/bin/c++ -- works
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/jdgarcia/vector1/build
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[t,fragile]{¿Y si quiero elegir el compilador?}
+\begin{lstlisting}[style=terminal,basicstyle=\tiny\ttfamily]
+jdgarcia@gavilan:~//vector1/build$ cmake .. -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang
+-- Configuring done
+You have changed variables that require your cache to be deleted.
+Configure will be re-run and you may have to reset some variables.
+The following variables have changed:
+CMAKE_C_COMPILER= clang
+CMAKE_CXX_COMPILER= clang++
+
+-- The C compiler identification is Clang 3.8.0
+-- The CXX compiler identification is Clang 3.8.0
+-- Check for working C compiler: /usr/bin/clang
+-- Check for working C compiler: /usr/bin/clang -- works
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/clang++
+-- Check for working CXX compiler: /usr/bin/clang++ -- works
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/jdgarcia//vector1/build
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[t,fragile]{Proceso de compilación}
+\begin{lstlisting}[style=terminal,basicstyle=\tiny\ttfamily]
+jdgarcia@gavilan:~/vector1/build$ make
+Scanning dependencies of target dcl
+[ 50%] Building CXX object src/CMakeFiles/dcl.dir/vectint.cpp.o
+Linking CXX static library libdcl.a
+[ 50%] Built target dcl
+Scanning dependencies of target test1
+[100%] Building CXX object samples/CMakeFiles/test1.dir/main1.cpp.o
+Linking CXX executable ../test1
+[100%] Built target test1
+\end{lstlisting}
+\end{frame}
+
+\subsection{Mis primeras pruebas}
+
+\begin{frame}[t]{Casos de pruebas y pruebas}
+\begin{itemize}
+  \item En GTest podemos definir pruebas y agruparlas en casos de prueba.
+    \begin{itemize}
+      \item Hacemos uso de la macro \cppid{TEST}.
+      \item Caso de prueba (\emph{test case}): Prueba elemental.
+      \item Prueba: Cada una de las pruebas de un caso de prueba.
+    \end{itemize}
+
+  \vfill
+  \item Realización de comprobaciones:
+    \begin{itemize}
+      \item \cppid{EXPECT\_EQ}: Comprobación no fatal.
+      \item \cppid{ASSERT\_EQ}: Comprobación no fatal.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{Probando la construcción}
+\begin{block}{utest/vectint\_constructor.cpp}
+\lstinputlisting{08-libs/examples/vector2/utest/vectint_constructor.cpp}
+\end{block}
+\end{frame}
+
+\begin{frame}[t,fragile]{Ejecutando las pruebas}
+\begin{lstlisting}[style=terminal]
+jdgarcia@gavilan:~/vector2/build$ ./vectint_utest 
+Running main() from gtest_main.cc
+[==========] Running 2 tests from 1 test case.
+[----------] Global test environment set-up.
+[----------] 2 tests from vectint_constructor
+[ RUN      ] vectint_constructor.empty
+[       OK ] vectint_constructor.empty (0 ms)
+[ RUN      ] vectint_constructor.sized
+[       OK ] vectint_constructor.sized (0 ms)
+[----------] 2 tests from vectint_constructor (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 2 tests from 1 test case ran. (0 ms total)
+[  PASSED  ] 2 tests.
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[t,fragile]{Comprobando la copia}
+\begin{columns}[T]
+
+\column{.5\textwidth}
+\begin{block}{utest/vectint\_copy.cpp}
+\lstinputlisting[lastline=15]{08-libs/examples/vector2/utest/vectint_copy.cpp}
+\end{block}
+
+\column{.5\textwidth}
+\begin{block}{utest/vectint\_copy.cpp}
+\lstinputlisting[firstline=17]{08-libs/examples/vector2/utest/vectint_copy.cpp}
+\end{block}
+\end{columns}
+\end{frame}
+
+\begin{frame}[t]{Configurando la compilación de las pruebas}
+\begin{block}{utest/CMakeLists.txt}
+\lstinputlisting[basicstyle=\tiny]{08-libs/examples/vector2/utest/CMakeLists.txt}
+\end{block}
+\end{frame}
+
+\begin{frame}[t,fragile]{Integrando las pruebas en CMake}
+\begin{itemize}
+  \item Basta añadir una invocación a \cppid{enable\_testing()} antes de
+        incluir el directorio de tests.
+\end{itemize}
+
+\vfill
+\begin{block}{CMakeLists.txt}\small
+\begin{lstlisting}
+#...
+enable_testing()
+add_subdirectory(utest)
+\end{lstlisting}
+\end{block}
+
+\vfill
+\begin{itemize}
+  \item Se genera nuevo objetivo para ejecutar las pruebas
+    \begin{itemize}
+      \item \cppkey{make test}.
+      \item \cppkey{ctest}.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t,fragile]{Ejecutando las pruebas}
+\begin{lstlisting}[style=terminal]
+jdgarcia@gavilan:~/github-repos/examples/gtesttalk/vector2/build$ make test
+Running tests...
+Test project /home/jdgarcia/github-repos/examples/gtesttalk/vector2/build
+    Start 1: vectint_copy.copy_construct
+1/4 Test #1: vectint_copy.copy_construct ......   Passed    0.00 sec
+    Start 2: vectint_copy.copy_assign
+2/4 Test #2: vectint_copy.copy_assign .........   Passed    0.00 sec
+    Start 3: vectint_constructor.empty
+3/4 Test #3: vectint_constructor.empty ........   Passed    0.00 sec
+    Start 4: vectint_constructor.sized
+4/4 Test #4: vectint_constructor.sized ........   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =   0.01 sec
+\end{lstlisting}
+\end{frame}
+
+
+

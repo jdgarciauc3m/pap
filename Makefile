@@ -21,8 +21,10 @@ include 03-copymove/Makefile.def
 include 04-memmgmt/Makefile.def
 include 06-generic/Makefile.def
 include 07-stl/Makefile.def
+include 08-libs/Makefile.def
 include lab1-tdu/Makefile.def
 include lab2-smartptr/Makefile.def
+include lab3-generic/Makefile.def
 
 ALL_PARTS= \
 $(GUIDE_PARTS) \
@@ -32,18 +34,22 @@ $(COPYMOVE_PARTS) \
 $(MEMMGMT_PARTS) \
 $(GENERIC_PARTS) \
 $(STL_PARTS) \
+$(LIBS_PARTS) \
 $(LAB1_TDU_PARTS) \
 $(LAB2_SMARTPTR_PARTS) \
+$(LAB3_GENERIC_PARTS) \
 
 ALL_SLIDES_FINAL_PDF= \
 $(FINAL_DIR)/$(INTRO_PDF) \
 $(FINAL_DIR)/$(FUNDCAP_PDF) \
 $(FINAL_DIR)/$(COPYMOVE_PDF) \
 $(FINAL_DIR)/$(MEMMGMT_PDF) \
-$(FINAL_DIR)/$(STL_PDF) \
 $(FINAL_DIR)/$(GENERIC_PDF) \
+$(FINAL_DIR)/$(STL_PDF) \
+$(FINAL_DIR)/$(LIBS_PDF) \
 $(FINAL_DIR)/$(LAB1_TDU_PDF) \
 $(FINAL_DIR)/$(LAB2_SMARTPTR_PDF) \
+$(FINAL_DIR)/$(LAB3_GENERIC_PDF) \
 
 ALL_FINAL_PDF=\
 $(FINAL_DIR) \
@@ -72,5 +78,7 @@ include 03-copymove/Makefile.mk
 include 04-memmgmt/Makefile.mk
 include 06-generic/Makefile.mk
 include 07-stl/Makefile.mk
+include 08-libs/Makefile.mk
 include lab1-tdu/Makefile.mk
 include lab2-smartptr/Makefile.mk
+include lab3-generic/Makefile.mk

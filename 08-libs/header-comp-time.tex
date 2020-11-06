@@ -1,0 +1,233 @@
+\section{Includes y tiempo de compilación}
+
+\begin{frame}[t]{Modelo de inclusión}
+\begin{itemize}
+  \item El modelo de inclusión de archivos cabecera de C/C++:
+    \begin{itemize} 
+      \item Realiza una sustitución de cada directiva por el
+            contenido del archivo incluido.
+      \item Posteriormente se compila el archivo resultante.
+    \end{itemize}
+
+  \vfill
+  \item Observaciones:
+    \begin{itemize}
+      \item Se compilan muchas líneas de código.
+      \item Las inclusiones innecesarias retrasan la compilación.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t,fragile]{Inclusión múltiple}
+\begin{itemize}
+  \item Si se incluye un archivo de cabecera múltiples veces se generan errores
+        al intentar definirse dos veces la misma clase, función, \ldots
+
+  \item ¿Cómo evitar la inclusión múltiple?
+    \begin{itemize}
+      \item Usando guardas de include
+    \end{itemize}
+\end{itemize}
+
+\begin{columns}
+
+\column{.5\textwidth}
+\begin{block}{elemento.h}
+\begin{lstlisting}[basicstyle=\tiny\ttfamily]
+#ifndef ELEMENTO_H
+#define ELEMENTO_H
+
+class elemento {
+  // Detalles...
+};
+
+#endif
+\end{lstlisting}
+\end{block}
+
+\pause
+\column{.5\textwidth}
+\begin{block}{documento.h}
+\begin{lstlisting}[basicstyle=\tiny\ttfamily]
+#include "elemento.h
+#include <iostream>
+// ...
+#include "elemento.h" // Sin problemas
+\end{lstlisting}
+\end{block}
+
+\end{columns}
+\end{frame}
+
+\begin{frame}[t,fragile]{Tiempo de compilación}
+\lstinputlisting{08-libs/headcmptime/main.cpp}
+\vfill
+\begin{lstlisting}[style=terminal]
+gcc -E main.cpp | wc -l
+\end{lstlisting}
+\begin{lstlisting}[style=terminal]
+27236
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[t,fragile]{Tiempo de compilación}
+\lstinputlisting{08-libs/headcmptime/main2.cpp}
+\vfill
+\begin{lstlisting}[style=terminal]
+gcc -E main.cpp | wc -l
+\end{lstlisting}
+\begin{lstlisting}[style=terminal]
+48381
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[t,fragile]{Declaraciones adelantadas}
+\begin{itemize}
+  \item Hay casos en que el compilador no necesita ver una clase.
+    \begin{itemize}
+      \item Es suficiente con una referencia adelantada.
+    \end{itemize}
+\end{itemize}
+\begin{columns}
+
+\column{.5\textwidth}
+\begin{block}{elemento.h}
+\begin{lstlisting}[basicstyle=\tiny\ttfamily]
+class elemento {
+  // Detalles...
+};
+\end{lstlisting}
+\end{block}
+
+\begin{block}{documento.h}
+\begin{lstlisting}[basicstyle=\tiny\ttfamily]
+#include "elemento.h
+
+class docuemnto {
+public:
+  //...
+  void store(elemento & e);
+};
+\end{lstlisting}
+\end{block}
+
+\pause
+\column{.5\textwidth}
+\begin{block}{elemento.h}
+\begin{lstlisting}[basicstyle=\tiny\ttfamily]
+class elemento {
+  // Detalles...
+};
+\end{lstlisting}
+\end{block}
+
+\begin{block}{documento.h}
+\begin{lstlisting}[basicstyle=\tiny\ttfamily]
+class elemento;
+
+class docuemnto {
+public:
+  //...
+  void store(elemento & e);
+};
+\end{lstlisting}
+\end{block}
+
+
+\end{columns}
+\end{frame}
+
+\begin{frame}[t]{Declaraciones versus definiciones}
+\begin{itemize}
+  \item ¿Cuándo es suficiente una referencia adelantada?
+    \begin{itemize}
+      \item Cuando no es necesario conocer el tamaño de un objeto de ese tipo; y
+      \item no se necesita saber qué operaciones ofrece un objeto de ese tipo.
+    \end{itemize} 
+
+  \vfill
+  \item Ejemplos en que la declaración adelantada de un tipo \cppid{T} no es suficiente:
+    \begin{itemize}
+      \item Si se define una clase con un dato miembro de tipo \cppid{T}.
+      \item Si se define una variable de tipo \cppid{T}.
+      \item Si se declara una función que toma un valor de tipo \cppid{T} por valor.
+      \item Si se declara una función que devuelve un valor de tipo \cppid{T} por valor.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{Optimización de includes}
+\begin{itemize}
+  \item Reducir al máximo los ficheros que se incluyen en cualquier archivo.
+    \begin{itemize}
+      \item Reduce el número de archivos que se abren.
+    \end{itemize}
+  \vfill
+  \item Si se puede elegir entre incluir una cabecera en un \cppid{.h} o en un \cppid{.cpp}
+        es mejor optar por hacerlo en el \cppid{.cpp}.
+    \begin{itemize}
+      \item El impacto se propaga más si se hace un un \cppid{.h}.
+    \end{itemize}
+  \vfill
+  \item Si es necesario definir archivos de cabecera con conjuntos de declaraciones adelantadas
+        relacionadas entre si.
+    \begin{itemize}
+      \item Ejemplo: \cppid{<iosfwd>} contiene declaraciones adelantadas para \cppid{<iostream>}.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{Ejemplo}
+\begin{columns}
+
+\column{.52\textwidth}
+\begin{block}{fecha.h}
+\lstinputlisting[basicstyle=\tiny\ttfamily]{08-libs/iosfwd/fecha.h}
+\end{block}
+
+\column{.48\textwidth}
+\begin{block}{fecha.cpp}
+\lstinputlisting[basicstyle=\tiny\ttfamily]{08-libs/iosfwd/fecha.cpp}
+\end{block}
+
+\end{columns}
+\end{frame}
+
+\begin{frame}{Bibliotecas header-only}
+\begin{itemize}
+  \item Una biblioteca \emph{header-only} es una biblioteca que está autocontenida en uno o más
+        archivos de cabecera.
+    \begin{itemize}
+      \item Ejemplos: Algunos componentes de \emph{Boost}; \emph{includeOS}; \emph{Eigen}; \ldots
+    \end{itemize}
+
+  \vfill
+  \item \textgood{Ventajas}:
+    \begin{itemize}
+      \item No necesitan compilarse.
+      \item No necesitan empaquetarse o instalarse.
+    \end{itemize}
+
+  \vfill
+  \item \textgood{Desventajas}:
+    \begin{itemize}
+      \item Tiempos de compilación más largos.
+      \item Cualquier cambio requiere recompilar todas las unidades de traducción que la incluyen.
+      \item Posible explosión de tamaño de código binario.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{Cabeceras precompiladas}
+\begin{itemize}
+  \item \textmark{Idea básica}: Tener precompilado el código derivado de un archivo de cabecera.
+    \begin{itemize}
+      \item Útil para ahorrar tiempo si la cabecera se incluye desde muchos sitios.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+%\begin{frame}{El futuro: Módulos}
+%\end{frame}
+
+% TODO: Idom PIMPL
