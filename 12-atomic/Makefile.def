@@ -1,0 +1,9 @@
+ATOMIC_BASE= 12-atomic
+ATOMIC_PARTS= \
+$(ATOMIC_BASE)/*.tex  \
+metadata.tex
+
+ATOMIC_OUT=12-atomic
+ATOMIC_PDF=$(ATOMIC_OUT).pdf
+
+FINAL_ATOMIC_PDF=$(FINAL_DIR)/$(ATOMIC_PDF)

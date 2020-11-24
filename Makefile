@@ -24,6 +24,7 @@ include 07-stl/Makefile.def
 include 08-libs/Makefile.def
 include 10-conc/Makefile.def
 include 11-sincr/Makefile.def
+include 12-atomic/Makefile.def
 include lab1-tdu/Makefile.def
 include lab2-smartptr/Makefile.def
 include lab3-generic/Makefile.def
@@ -38,6 +39,7 @@ $(GENERIC_PARTS) \
 $(STL_PARTS) \
 $(CONC_PARTS) \
 $(SINCR_PARTS) \
+$(ATOMIC_PARTS) \
 $(LIBS_PARTS) \
 $(LAB1_TDU_PARTS) \
 $(LAB2_SMARTPTR_PARTS) \
@@ -52,6 +54,7 @@ $(FINAL_DIR)/$(GENERIC_PDF) \
 $(FINAL_DIR)/$(STL_PDF) \
 $(FINAL_DIR)/$(CONC_PDF) \
 $(FINAL_DIR)/$(SINCR_PDF) \
+$(FINAL_DIR)/$(ATOMIC_PDF) \
 $(FINAL_DIR)/$(LIBS_PDF) \
 $(FINAL_DIR)/$(LAB1_TDU_PDF) \
 $(FINAL_DIR)/$(LAB2_SMARTPTR_PDF) \
@@ -87,6 +90,7 @@ include 07-stl/Makefile.mk
 include 08-libs/Makefile.mk
 include 10-conc/Makefile.mk
 include 11-sincr/Makefile.mk
+include 12-atomic/Makefile.mk
 include lab1-tdu/Makefile.mk
 include lab2-smartptr/Makefile.mk
 include lab3-generic/Makefile.mk
