@@ -22,6 +22,8 @@ include 04-memmgmt/Makefile.def
 include 06-generic/Makefile.def
 include 07-stl/Makefile.def
 include 08-libs/Makefile.def
+include 10-conc/Makefile.def
+include 11-sincr/Makefile.def
 include lab1-tdu/Makefile.def
 include lab2-smartptr/Makefile.def
 include lab3-generic/Makefile.def
@@ -34,6 +36,8 @@ $(COPYMOVE_PARTS) \
 $(MEMMGMT_PARTS) \
 $(GENERIC_PARTS) \
 $(STL_PARTS) \
+$(CONC_PARTS) \
+$(SINCR_PARTS) \
 $(LIBS_PARTS) \
 $(LAB1_TDU_PARTS) \
 $(LAB2_SMARTPTR_PARTS) \
@@ -46,6 +50,8 @@ $(FINAL_DIR)/$(COPYMOVE_PDF) \
 $(FINAL_DIR)/$(MEMMGMT_PDF) \
 $(FINAL_DIR)/$(GENERIC_PDF) \
 $(FINAL_DIR)/$(STL_PDF) \
+$(FINAL_DIR)/$(CONC_PDF) \
+$(FINAL_DIR)/$(SINCR_PDF) \
 $(FINAL_DIR)/$(LIBS_PDF) \
 $(FINAL_DIR)/$(LAB1_TDU_PDF) \
 $(FINAL_DIR)/$(LAB2_SMARTPTR_PDF) \
@@ -79,6 +85,8 @@ include 04-memmgmt/Makefile.mk
 include 06-generic/Makefile.mk
 include 07-stl/Makefile.mk
 include 08-libs/Makefile.mk
+include 10-conc/Makefile.mk
+include 11-sincr/Makefile.mk
 include lab1-tdu/Makefile.mk
 include lab2-smartptr/Makefile.mk
 include lab3-generic/Makefile.mk

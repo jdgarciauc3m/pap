@@ -1,0 +1,143 @@
+\section{Objetos mutex}
+
+\subsection{Tipos de mutex}
+
+\begin{frame}{Clasificación de \emph{mutex}}
+\begin{itemize}
+  \item Representan el acceso exclusivo a un recurso.
+    \begin{itemize}
+      \item \cppid{mutex}: \emph{Mutex} básico no recursivo.
+      \item \cppid{recursive\_mutex}: Un \emph{mutex} que puede ser adquirido más de una vez por un mismo hilo.
+      \item \cppid{timed\_mutex}: \emph{Mutex} no recursivo con operaciones con tiempo límite.
+      \item \cppid{recursive\_timed\_mutex}: \emph{Mutex} recursivo con operaciones con tiempo límite.
+    \end{itemize}
+  \item Solamente un hilo puede poseer un \emph{mutex} en un momento dado.
+    \begin{itemize}
+      \item Adquirir un \emph{mutex} $\rightarrow$ obtener acceso exclusivo al objeto.
+        \begin{itemize}
+          \item Operación bloqueante.
+        \end{itemize}
+      \item Liberar un \emph{mutex} $\rightarrow$ Liberar el acceso exclusivo al objeto.
+        \begin{itemize}
+          \item Permite que otro hilo obtenga el acceso.
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\subsection{Mutex básico}
+
+\begin{frame}{Operaciones}
+\begin{itemize}
+  \item Construcción y destrucción:
+    \begin{itemize}
+      \item Se puede construir por defecto.
+      \item No se pueden copiar ni mover.
+      \item El destructor puede dar comportamiento no definido si el \emph{mutex} no está libre.
+    \end{itemize}
+  \item Adquisición y liberación:
+    \begin{itemize}
+      \item \cppid{m.lock()}: Adquiere el \emph{mutex} de forma bloqueante.
+      \item \cppid{m.unlock()}: Libera el \emph{mutex}.
+      \item \cppid{r = m.try\_lock()}: Intenta adquirir el \emph{mutex}, devolviendo indicación de éxito.
+    \end{itemize}
+  \item Otras:
+    \begin{itemize}
+      \item \cppid{h = m.native\_handle()}: Devuelve el identificador dependiente de la plataforma de tipo
+            \cppid{native\_handle\_type}.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Ejemplo}
+\begin{lstlisting}
+mutex mutex_salida;
+
+void imprime(int x) {
+  mutex_salida.lock();
+  cout << x << endl;
+  mutex_salida.unlock();
+}
+
+void imprime(double x) {
+  mutex_salida.lock();
+  cout << x << endl;
+  mutex_salida.unlock();
+}
+
+void f() {
+  thread t1{imprime, 10};
+  thread t2(imprime, 5.5};
+  thread t3(imprime, 3);
+ 
+  t1.join(); t2.join(); t3.join();
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Exclusión mutua recursiva}
+\begin{lstlisting}
+mutex mutex_salida;
+
+template <typename T, typename ... U>
+void imprime(T x, U resto ...) {
+  mutex_salida.lock();
+  cout << x;
+  imprime(resto...); // Deadlock
+  mutex_salida.unlock();
+}
+
+recursive_mutex rmutex_salida;
+
+template <typename T, typename ... U>
+void imprime(T x, U resto ...) {
+  rmutex_salida.lock();
+  cout << x;
+  imprime(resto...); // No hay deadlock
+  rmutex_salida.unlock();
+}
+\end{lstlisting}
+\end{frame}
+
+\subsection{Exclusión mutua y errores}
+
+\begin{frame}[fragile]{Errores en exclusión mutua}
+\begin{itemize}
+  \item En caso de error se lanza la excepción \cppid{system\_error}.
+  \item Códigos de error:
+    \begin{itemize}
+      \item \cppid{resource\_deadlock\_would\_occur}.
+      \item \cppid{resource\_unavailabe\_try\_again}.
+      \item \cppid{operation\_not\_permitted}.
+      \item \cppid{device\_or\_resource\_busy}.
+      \item \cppid{invalid\_argument}.
+    \end{itemize}
+\begin{lstlisting}
+mutex m;
+try {
+  m.lock();
+  // 
+  m.lock();
+}
+catch (system_error & e) {
+  cerr << e.what() << endl;
+  cerr << e.code() << endl;
+}
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+
+\subsection{Operaciones con tiempo límite}
+
+\begin{frame}{Tiempo límite}
+\begin{itemize}
+  \item Operaciones soportadas por \cppid{timed\_mutex} y \cppid{recursive\_timed\_mutex}.
+  \item Añaden operaciones de adquisión con especificación de tiempo límite.
+    \begin{itemize}
+      \item \cppid{r = m.try\_lock\_for(d)}: Intenta adquirir el \emph{mutex} durante una duración
+            \cppid{d}, devolviendo indicación de éxito.
+      \item \cppid{r = m.try\_lock\_until(t)}: Intenta adquirir el \emph{mutex} hasta un momento
+            en el tiempo, devolviendo indicación de éxito.
+    \end{itemize}
+\end{itemize}
+\end{frame}

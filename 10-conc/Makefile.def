@@ -1,0 +1,9 @@
+CONC_BASE= 10-conc
+CONC_PARTS= \
+$(CONC_BASE)/*.tex  \
+metadata.tex
+
+CONC_OUT=10-conc
+CONC_PDF=$(CONC_OUT).pdf
+
+FINAL_CONC_PDF=$(FINAL_DIR)/$(CONC_PDF)

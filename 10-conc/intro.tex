@@ -1,0 +1,425 @@
+\section{Introducción}
+
+\subsection{Concurrencia en C++}
+
+\begin{frame}{Motivación}
+\begin{itemize}
+  \item C++11 ofrece un modelo de concurrencia propio.
+  \item Cualquier implementación que cumple el estándar debe proporcionarlo.
+    \begin{itemize}
+      \item Resuelve problemas inherentes a PThreads.
+      \item Portabilidad de código concurrente: Windows, POSIX, ...
+    \end{itemize}
+  \item Implicaciones:
+    \begin{itemize}
+      \item Modificaciones en el lenguaje.
+      \item Modificaciones en la biblioteca estándar.
+    \end{itemize}
+  \item Influencia sobre C11 (ISO/IEC 9899:2011).
+  \item \alert{Importante}: Concurrencia y paralelismo son conceptos relacionados pero distintos.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Estructura}
+\begin{itemize}
+  \item El lenguaje ofrece:
+    \begin{itemize}
+      \item Un nuevo modelo de memoria.
+      \item Variables \cppkey{thread\_local}.
+    \end{itemize}
+  \item La biblioteca ofrece:
+    \begin{itemize}
+      \item Tipos atómicos.
+        \begin{itemize}
+          \item Útiles para programación libre de cerrojos de forma portable.
+        \end{itemize}
+      \item Abstracciones portables para la concurrencia.
+        \begin{itemize}
+          \item \cppid{thread}.
+          \item \cppid{mutex}.
+          \item \cppid{lock}.
+          \item \cppid{packaged\_task}.
+          \item \cppid{future}.
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\subsection{Hilos}
+
+\begin{frame}[fragile]{Lanzamiento de hilos}
+\begin{itemize}
+  \item Un hilo representado por la clase \cppid{std::thread}.
+    \begin{itemize}
+      \item Normalmente representa un hilo del SO.
+    \end{itemize}
+\begin{lstlisting}
+void f1();
+
+struct f2 {
+  void operator()();
+};
+
+void g() {
+  thread t1{f1}; // Lanza un hilo que ejecuta f1()
+  thread t2{f2()}; // Lanza un hilo que ejecuta f2::operator()()
+
+  t1.join(); // Espera a que t1 termine.
+  t2.join(); // Espera a que t2 termine.
+}
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Objetos compartidos}
+\begin{itemize}
+  \item Dos hilos pueden acceder a un objeto compartido.
+  \item Posibilidad de carreras de datos.
+\end{itemize}
+\begin{lstlisting}
+int x = 42;
+
+void f() { ++x; }
+void g() { x=0; }
+void h() { cout << "Hola" << endl; }
+void i() { cout << "Adios" << endl; }
+
+void carrera() {
+  thread t1{f}; thread t2{g};
+
+  t1.join(); t2.join();
+
+  thread t3{h}; thread t4{i};
+
+  t3.join(); t4.join();
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Paso de argumentos}
+\begin{itemize}
+  \item Paso de parámetros simplificado sin necesidad de \emph{casts}.
+  \item Varias alternativas.
+\end{itemize}
+\begin{lstlisting}
+void f1(int x);
+
+struct f2 {
+  void operator()();
+  f2(int px) : x{px} {}
+  int x;
+}
+
+void g() {
+  thread t1{f1, 10}; // Ejecuta f1(10)
+  thread t2{f2{20}}; // Ejecuta f2{20}.operator()()
+  thread t3{[] { f3(42); } }; // Ejecuta una lambda
+
+  t1.join();
+  t2.join();
+  t3.join();
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Primera alternativa para resultados}
+\begin{itemize}
+  \item Devolver resultados usando punteros o referencias.
+  \begin{itemize}
+    \item Puede tener problemas de condiciones de carrera.
+    \item Pero es simple.
+  \end{itemize}
+\begin{lstlisting}
+void suma(const vector<int> & v, int & r) {
+  r = accumulate(v.begin(), v.end(), 0)
+}
+
+void f() {
+  vector<int> w1 {1, 2, 4, 8, 16};
+  vector<int> w2 {2, 4, 6, 8, 10};
+  int x1, x2;
+  thread t1(suma, w1, x1);
+  thread t2(suma, w2, x2);
+  t1.join();
+  t2.join();
+  cout << "Suma w1 -> " << x1 << " w2 -> " << x2 << endl;
+}
+\end{lstlisting}
+  \item \alert{Importante}: Correcto mientras no haya datos compartidos.
+\end{itemize}
+\end{frame}
+
+\subsection{Acceso a datos compartidos}
+
+\begin{frame}[fragile]{Exclusión mutua}
+\begin{itemize}
+  \item \cppid{mutex} permite controlar el acceso con exclusión mutua a un recurso.
+    \begin{itemize}
+      \item \cppid{lock()}: Adquiere el cerrojo asociado.
+      \item \cppid{unlock()}: Libera el cerrojo asociado.
+    \end{itemize}
+\begin{lstlisting}
+mutex m;
+int x = 0;
+
+void f() {
+  m.lock();
+  ++x;
+  m.unlock();
+}
+
+void g() {
+  thread t1(f); thread t2(f);
+  t1.join(); t2.join();
+
+  cout << x << endl;
+}
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Problemas con \texttt{lock()}/\texttt{unlock()}}
+\begin{itemize}
+  \item Posibles problemas:
+    \begin{itemize}
+      \item Olvido de liberar cerrojo.
+      \item Excepciones.
+    \end{itemize}
+  \item Solución: \cppid{unique\_lock}.
+\begin{lstlisting}
+mutex m;
+int x = 0;
+
+void f() {
+  unique_lock<mutex> l{m}; // Adquiere el cerrojo
+  ++x;
+} // Libera el cerrojo
+
+void g() {
+  thread t1(f); thread t2(f);
+  t1.join(); t2.join();
+
+  cout << x << endl;
+}
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Adquisición de múltiples \texttt{mutex}}
+\begin{itemize}
+  \item La función \cppid{lock()} permite adquirir a la vez varios \cppid{mutex}.
+    \begin{itemize}
+      \item Adquiere todos o ninguno.
+      \item Si alguno está bloqueado espera dejando libres todos.
+    \end{itemize}
+\begin{lstlisting}
+mutex m1, m2, m3;
+void f() {
+  lock(m1, m2, m3);
+  // Acceso a datos compartidos
+
+} // Cuidado: No se liberan los cerrojos
+\end{lstlisting}
+  \item Especialmente útil en cooperación con \cppid{unique\_lock}
+\begin{lstlisting}
+void f() {
+  unique_lock l1{m1, defer_lock}, unique_lock l2{m2, defer_lock};
+  lock(l1, l2);
+  // Acceso a datos compartidos
+
+} // Ahora si se liberan los cerrojos
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+
+\subsection{Mecanismos de espera}
+
+\begin{frame}[fragile]{Esperas de tiempo}
+\begin{itemize}
+  \item Acceso al reloj.
+\begin{lstlisting}
+using namespace std::chrono;
+auto t1 = high_resolution_clock::now();
+\end{lstlisting}
+  \item Diferencia de tiempos.
+\begin{lstlisting}
+auto dif = duration_cast<nanoseconds>(t2-t1);
+cout << dif.count() << endl;
+\end{lstlisting}
+  \item Especificación de una espera.
+\begin{lstlisting}
+this_thread::sleep_for(microseconds{500});
+this_thread::sleep_until(t + milliseconds{10});
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Variables condición}
+\begin{itemize}
+  \item Mecanismo para sincronizar hilos en acceso a recursos compartidos.
+    \begin{itemize}
+      \item \cppid{wait()}: Espera en un \cppid{mutex}.
+      \item \cppid{notify\_one()}: Despierta a un hilo en espera.
+      \item \cppid{notify\_all()}: Despierta a todos los hilos en espera.
+    \end{itemize}
+\begin{lstlisting}
+class peticion;
+
+queue<peticion> cola;
+condition_variable cv;
+mutex m;
+
+void productor();
+void consumidor();
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Productor}
+\begin{lstlisting}
+void consumidor() {
+  for (;;) {
+    unique_lock<mutex> l{m};
+
+    while (cv.wait(l));
+
+    auto m = cola.front();
+    cola.pop();
+    l.unlock();
+   
+    procesa(p);
+  };
+}
+\end{lstlisting}
+\begin{itemize}
+  \item Efecto de \cppid{wait}:
+    \begin{enumerate}
+      \item Libera el cerrojo y espera una notificación.
+      \item Adquiere el cerrojo al despertarse.
+    \end{enumerate}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Consumidor}
+\begin{lstlisting}
+void productor() {
+  for (;;) {
+    peticion p = genera();
+
+    unique_lock<mutex> l{m};
+    m.push(p);
+
+    cv.notify_one();
+  }
+}
+\end{lstlisting}
+\begin{itemize}
+\item Efecto de \cppid{notify\_one()}:
+  \begin{enumerate}
+    \item Despierta a uno de los hilos esperando en la condición.
+  \end{enumerate}
+\end{itemize}
+\end{frame}
+
+\subsection{Futuros y promesas}
+
+\begin{frame}{Devolución de valores}
+\begin{itemize}
+  \item La combinación de un \cppid{future} y una \cppid{promise} implementan de forma
+        eficiente la transferencia de valores entre hilos.
+    \begin{itemize}
+      \item Evitan la necesidad de hilos.
+    \end{itemize}
+  \item Idea general
+    \begin{itemize}
+      \item Cuando un hilo necesita pasar un valor a otro hilo pone el valor en una \emph{promesa}.
+      \item La implementación hace que el valor esté disponible en el correspondiente futuro.
+    \end{itemize}
+  \item Acceso al futuro mediante \cppid{f.get()}:
+    \begin{itemize}
+      \item Si se ha asignado un valor $\leftarrow$ obtiene el valor.
+      \item En otro caso $\leftarrow$ el hilo llamante se bloquea hasta que esté disponible.
+    \end{itemize}
+  \item Acceso a la promesa mediante \cppid{p.set\_value()}:
+    \begin{itemize}
+      \item Asigna el valor.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Futuros y promesas}
+\begin{lstlisting}
+void f1(promise<int> & p) {
+  try {
+    int x = calcula();
+    p.set_value(x);
+  }
+  catch (...) {
+    p.set_exception(current_exception());
+  }
+}
+
+void f2(future<int> & f) {
+  try {
+    int v = f.get();
+    procesa(v);
+  }
+  catch (...) {
+    cerr << "Error" << endl;
+  }
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Tareas empaquetadas}
+\begin{itemize}
+  \item Facilitan la tarea de \emph{conectar} un futuro y una promesa.
+    \begin{itemize}
+      \item \cppid{packaged\_task} es un envoltorio para poner un valor en una \emph{promesa}.
+      \item Permite obtener el \emph{futuro} asociado a la \emph{promesa}: \cppid{get\_future}.
+    \end{itemize}
+\begin{lstlisting}
+int doble(int x) { return x*x; }
+
+void g() {
+  packaged_task<int(int)> pt1{doble};
+  packaged_task<int(int)> pt2{doble};
+
+  future<int> f1 { pt1.get_future() };
+  future<int> f2 { pt2.get_future() };
+
+  thread t1{move(pt1), 10};
+  thread t2{move(pt2), 20};
+
+  cout << "La suma es " << f1.get() + f2.get() << endl;
+}
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+
+\subsection{Tareas asíncronas}
+
+\begin{frame}{Tareas asíncronas y futuros}
+\begin{itemize}
+  \item Una tarea asíncrona permite el lanzamiento simple de la ejecución de una tarea:
+    \begin{itemize}
+      \item En otro hilo de ejecución.
+      \item Como una tarea diferida.
+    \end{itemize}
+  \item Un futuro es un objeto que permite que un hilo pueda devolver un valor a la sección de código que lo invocó.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Invocación de tareas asíncronas}
+\begin{lstlisting}
+#include <future>
+#include <iostream>
+
+int main() {
+  std::future<int> r = std::async(tarea, 1, 10);
+  otra_tarea();
+  std::cout << "Resultado= " << r.get() << std::endl;
+  return 0;
+}
+\end{lstlisting}
+\end{frame}

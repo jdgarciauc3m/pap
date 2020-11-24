@@ -1,0 +1,94 @@
+\section{Cerrojos compartidos}
+
+\begin{frame}{Cerrojos compartidos}
+\begin{itemize}
+  \item C++14 añade la funcionalidad necesaria para que se pueda usar el
+        patrón de múltiples lectores con único escritor.
+    \begin{itemize}
+      \item Nuevos constructores para \cppid{unique\_lock<M>}.
+      \item Nueva clase \cppid{shared\_mutex}.
+      \item Nueva clase \cppid{upgrade\_mutex}.
+      \item Nueva clase \cppid{shared\_lock<M>}.
+      \item Nueva clase \cppid{upgrade\_lock<M>}.
+    \end{itemize}
+  \item Un \emph{mutex compartido} se puede bloquear con dos modos de propiedad distintos:
+    \begin{itemize}
+      \item Propiedad exclusiva (\cppid{lock()}).
+      \item Propiedad compartida (\cppid{lock\_shared()}).
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Modo exclusivo y modo compartido}
+\begin{itemize}
+  \item Se puede adquirir un mutex en modo exclusivo.
+    \begin{itemize}
+      \item Típico para un escritor.
+    \end{itemize}
+\begin{lstlisting}
+void escritor() {
+  lock_guard<shared_mutex> l(m);
+  escribir_datos();
+}
+\end{lstlisting}
+  \item Se puede adquirir un mutex en modo compartido.
+    \begin{itemize}
+      \item Típico para lectores.
+      \item Varios hilos pueden tener adquirido el mutex a la vez.
+      \item Evita serialización y mejora rendimiento.
+    \end{itemize}
+\begin{lstlisting}
+void escritor() {
+  shared_lock_guard<shared_mutex> l(m);
+  leer	_datos();
+}
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Ejemplo: Operador de asignación}
+\begin{itemize}
+  \item Escribir un operador de asignación \emph{thread-safe}.
+\end{itemize}
+\begin{lstlisting}
+class X {
+  mutable shared_mutex m;
+  datos d;
+public:
+  // ...
+  X & operator=(const X & x) {
+    if (this != &x) {
+      unique_lock<shared_mutex> tl(m);
+      unique_lock<shared_mutex> sl(x.m);
+      d = x.d;
+    }
+  }
+};
+\end{lstlisting}
+\begin{itemize}
+  \item Posibilidad de \emph{deadlock}
+    \begin{itemize}
+      \item Hilo 1: x1 = x2;
+      \item Hilo 2: x2 = x1;
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Evitando el deadlock}
+\begin{lstlisting}
+class X {
+  mutable shared_mutex m;
+  datos d;
+public:
+  // ...
+  X & operator=(const X & x) {
+    if (this != &x) {
+      unique_lock<shared_mutex> tl(m, defer_lock);
+      shared_unique_lock<shared_mutex> sl(x.m, defer_lock);
+      lock(tl, sl);
+      d = x.d;
+    }
+  }
+};
+\end{lstlisting}
+\end{frame}

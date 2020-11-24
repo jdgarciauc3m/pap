@@ -1,0 +1,9 @@
+SINCR_BASE= 11-sincr
+SINCR_PARTS= \
+$(SINCR_BASE)/*.tex  \
+metadata.tex
+
+SINCR_OUT=11-sincr
+SINCR_PDF=$(SINCR_OUT).pdf
+
+FINAL_SINCR_PDF=$(FINAL_DIR)/$(SINCR_PDF)

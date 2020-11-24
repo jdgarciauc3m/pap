@@ -1,0 +1,95 @@
+\section{Futuros y futuros compartidos}
+
+\subsection{Futuros}
+
+\begin{frame}[fragile]{¿Qué es un futuro?}
+\begin{itemize}
+  \item Un \emph{futuro} permite acceder a un \emph{estado compartido}.
+    \begin{itemize}
+      \item Permite recuperar un resultado depositado por una \emph{promesa}.
+    \end{itemize}
+  \item Es un tipo genérico parametrizado por el tipo del valor asociado.
+\begin{lstlisting}
+future<T> f;
+\end{lstlisting}
+  \item Un futuro es copiable, pero no movible.
+  \item Solamente se puede obtener el resultado de un futuro una vez
+        mediante \cppid{get()}.
+    \begin{itemize}
+      \item En otro caso, se puede usar \cppid{shared\_future}.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Construcción}
+\begin{lstlisting}
+future<T> f;
+\end{lstlisting}
+\begin{itemize}
+  \item Construcción por defecto.
+  \item Sin estado compartido.
+\end{itemize}
+
+\begin{lstlisting}
+future<T> f{g};
+\end{lstlisting}
+\begin{itemize}
+  \item Mueve el futuro \cppid{g} a \cppid{f}.
+\end{itemize}
+
+\begin{lstlisting}
+f = move(g);
+\end{lstlisting}
+\begin{itemize}
+  \item Mueve el futuro \cppid{g} a \cppid{f}.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Otras operaciones}
+\begin{lstlisting}
+b = f.valid();
+\end{lstlisting}
+\begin{itemize}
+\item Indica si el futuro tiene un \emph{estado compartido}.
+\end{itemize}
+
+\begin{lstlisting}
+x = f.get();
+\end{lstlisting}
+\begin{itemize}
+\item Mueve el varlor del \emph{estado compartido} a \cppid{x}.
+\end{itemize}
+
+\begin{lstlisting}
+f.wait();
+s = f.wait_for(d);
+s= f.wait_until(t);
+\end{lstlisting}
+\begin{itemize}
+  \item Espera a que llegue un valor.
+  \item Versión bloqueante y versiones con límite temporal
+  \item \cppid{s} del tipo \cppid{future\_status}.
+    \begin{itemize}
+      \item Enumerado con valores \cppid{ready}, \cppid{timeout}, \cppid{deferred}.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\subsection{Futuros compartidos}
+
+\begin{frame}[fragile]{Compartiendo un futuro}
+\begin{itemize}
+  \item Un futuro se puede consultar solamente una vez.
+    \begin{itemize}
+      \item Problemas si se desea consultar repetidamente o desde distintos lectores.
+    \end{itemize}
+  \item Un futuro compartido se inicia moviendo un futuro del mismo tipo.
+\begin{lstlisting}
+auto sf = f.share();
+shared_futur<T> sf{f};
+\end{lstlisting}
+  \item Diferencia importante: \cppid{get} devuelve una copia en vez de mover.
+\end{itemize}
+\end{frame}
+
